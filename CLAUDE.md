@@ -57,6 +57,11 @@ All secrets are in `.env` (gitignored) and set in Netlify dashboard:
 
 `STRAVA_CLIENT_ID`, `STRAVA_CLIENT_SECRET`, `STRAVA_VERIFY_TOKEN`, `SUPABASE_URL`, `SUPABASE_SERVICE_KEY`, `ANTHROPIC_API_KEY`, `ADMIN_SECRET`, `ADMIN_ATHLETE_ID`, `SITE_URL`
 
+## Git / Deployment
+
+- **Batch commits before pushing.** Every push to `main` triggers a Netlify deploy which uses build credits. Accumulate changes locally and push once when ready, rather than pushing after every small commit.
+- Deploys are automatic from `main` via GitHub integration.
+
 ## Key Architecture Decisions
 
 - **Background functions:** The backfill uses a Netlify Background Function (`-background.mjs` suffix) because regular functions have a 10s timeout. Background functions get 15 minutes.
