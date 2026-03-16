@@ -73,6 +73,10 @@ async function loadSettings() {
         <div class="loading">Loading your activities...</div>
       </div>
     </div>
+
+    <div class="settings-section">
+      <a href="/api/logout" class="disconnect-btn">Log Out</a>
+    </div>
   `;
 
   // Bind events
