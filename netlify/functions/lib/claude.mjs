@@ -58,7 +58,7 @@ function buildPrompt(activity, athlete) {
 - Moderate (Cat 4): 3.20–3.47
 - Fair (Cat 5): 2.58–2.84
 - Untrained: 1.86–2.49
-Use this to place the athlete in a category and roast (or grudgingly respect) them accordingly.`;
+Use this to place the athlete in a category and judge (or grudgingly respect) them accordingly.`;
   } else if (activity.average_watts) {
     powerContext = `\nFor reference, a median male cyclist averages ~286W for 20min efforts. Use this to calibrate your mockery.`;
   }
@@ -83,8 +83,8 @@ Guidelines:
 - Be funny and creative, not just mean
 - Reference specific stats that are weak, impressive, or funny
 - Short walks, low distances, and slow speeds deserve EXTRA savage treatment
-- If someone stopped a lot (big gap between moving and elapsed time), roast them for it
-- If the activity name is funny or tryhard, roast that too
+- If someone stopped a lot (big gap between moving and elapsed time), call them out
+- If the activity name is funny or tryhard, mock it
 - Low suffer scores mean they weren't even trying
 - Don't use hashtags or emojis
 - When referencing a Rule, just say "Rule #X" naturally — don't quote the full text
@@ -92,7 +92,7 @@ Guidelines:
 Athlete: ${athlete.firstname} ${athlete.lastname}
 ${stats.join('\n')}
 
-Generate a single roast:`;
+Generate a single commentary:`;
 }
 
 export async function generateRoast(activity, athlete) {

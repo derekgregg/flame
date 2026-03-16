@@ -37,7 +37,7 @@ async function loadSettings() {
           <input type="text" id="display-name" value="${user.display_name || ''}" placeholder="Your name">
         </div>
         <div class="settings-field">
-          <label for="weight-input">Weight (kg) <span class="text-muted">— for power-to-weight roasts</span></label>
+          <label for="weight-input">Weight (kg) <span class="text-muted">— for power-to-weight commentary</span></label>
           <input type="number" id="weight-input" value="${user.weight || ''}" min="30" max="200" step="0.1" placeholder="e.g. 75">
         </div>
         <div class="settings-field">

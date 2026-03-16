@@ -140,7 +140,7 @@ async function loadLeaderboard() {
   if (filterSport.value) params.set('sport_type', filterSport.value);
   if (sortBy.value) params.set('sort', sortBy.value);
 
-  leaderboard.innerHTML = '<div class="loading">Loading roasts...</div>';
+  leaderboard.innerHTML = '<div class="loading">Loading commentary...</div>';
 
   try {
     const res = await fetch(`/api/get-leaderboard?${params}`);
@@ -158,7 +158,7 @@ async function loadLeaderboard() {
     }
 
     if (!data.activities?.length) {
-      leaderboard.innerHTML = '<div class="empty-state"><p>No roasts yet. Connect a platform and go for a ride (or a gentle stroll — we judge those too).</p></div>';
+      leaderboard.innerHTML = '<div class="empty-state"><p>No commentary yet. Connect a platform and go for a ride (or a gentle stroll — we judge those too).</p></div>';
       return;
     }
 
