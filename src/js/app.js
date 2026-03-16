@@ -40,6 +40,21 @@ function formatDate(iso) {
   });
 }
 
+function decodePolyline(encoded) {
+  const coords = [];
+  let index = 0, lat = 0, lng = 0;
+  while (index < encoded.length) {
+    let shift = 0, result = 0, byte;
+    do { byte = encoded.charCodeAt(index++) - 63; result |= (byte & 0x1f) << shift; shift += 5; } while (byte >= 0x20);
+    lat += (result & 1) ? ~(result >> 1) : (result >> 1);
+    shift = 0; result = 0;
+    do { byte = encoded.charCodeAt(index++) - 63; result |= (byte & 0x1f) << shift; shift += 5; } while (byte >= 0x20);
+    lng += (result & 1) ? ~(result >> 1) : (result >> 1);
+    coords.push([lat / 1e5, lng / 1e5]);
+  }
+  return coords;
+}
+
 function platformBadges(activity) {
   const links = activity.platform_links || {};
   const labels = { strava: 'Strava', wahoo: 'Wahoo', garmin: 'Garmin', upload: 'Upload' };
@@ -105,6 +120,7 @@ function renderCard(a) {
       </div>
       <div class="activity-name">"${a.name}"</div>
       <div class="stats-grid">${statsHTML}</div>
+      ${a.route_polyline ? `<div class="activity-map" id="map-${a.id}"></div>` : ''}
       <div class="roast">${a.roast}</div>
       ${activityLinks(a)}
     </div>
@@ -172,6 +188,32 @@ async function loadLeaderboard() {
     }
 
     leaderboard.innerHTML = data.activities.map(renderCard).join('');
+
+    // Initialize maps for activities with polylines
+    for (const a of data.activities) {
+      if (a.route_polyline) {
+        const el = document.getElementById(`map-${a.id}`);
+        if (el && typeof L !== 'undefined') {
+          const coords = decodePolyline(a.route_polyline);
+          if (coords.length > 1) {
+            const map = L.map(el, {
+              zoomControl: false,
+              attributionControl: false,
+              dragging: false,
+              scrollWheelZoom: false,
+              doubleClickZoom: false,
+              touchZoom: false,
+            });
+            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+              maxZoom: 18,
+            }).addTo(map);
+            const polyline = L.polyline(coords, { color: '#39ff14', weight: 3, opacity: 0.8 });
+            polyline.addTo(map);
+            map.fitBounds(polyline.getBounds(), { padding: [20, 20] });
+          }
+        }
+      }
+    }
   } catch (err) {
     leaderboard.innerHTML = '<div class="empty-state"><p>Failed to load. Try again later.</p></div>';
     console.error(err);

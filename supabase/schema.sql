@@ -86,6 +86,9 @@ CREATE TABLE activities (
   roast TEXT,
   roast_generated_at TIMESTAMPTZ,
 
+  -- Route map
+  route_polyline TEXT,
+
   -- Dedup
   dedup_key TEXT,
   external_id TEXT,

@@ -56,7 +56,7 @@ export async function processActivity({ userId, platform, platformActivityId, ac
     // Activity already exists — merge this source into it
     const { data: existing } = await db
       .from('activities')
-      .select('platform_links, average_watts, max_watts, suffer_score, avg_heart_rate, max_heart_rate, avg_cadence, normalized_power, lap_data, enrichment_data')
+      .select('platform_links, average_watts, max_watts, suffer_score, avg_heart_rate, max_heart_rate, avg_cadence, normalized_power, lap_data, enrichment_data, route_polyline')
       .eq('id', dup.id)
       .single();
 
@@ -91,6 +91,12 @@ export async function processActivity({ userId, platform, platformActivityId, ac
       updates.max_speed = activity.max_speed;
       updates.sport_type = activity.sport_type;
       updates.dedup_key = dedupKey;
+      if (activity.route_polyline) updates.route_polyline = activity.route_polyline;
+    }
+
+    // Merge polyline if missing
+    if (!existing?.route_polyline && activity.route_polyline) {
+      updates.route_polyline = activity.route_polyline;
     }
 
     await db.from('activities').update(updates).eq('id', dup.id);
@@ -116,6 +122,7 @@ export async function processActivity({ userId, platform, platformActivityId, ac
     dedup_key: dedupKey,
     external_id: activity.external_id || null,
     platform_links: { [platform]: platformActivityId },
+    route_polyline: activity.route_polyline || null,
     // Source tracking (kept for queries and backwards compat)
     source_platform: platform,
     source_activity_id: platformActivityId,

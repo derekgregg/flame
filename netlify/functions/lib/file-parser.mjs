@@ -1,6 +1,7 @@
 import FitParser from 'fit-file-parser';
 import { XMLParser } from 'fast-xml-parser';
 import { analyzePower } from './power-analysis.mjs';
+import { encode as encodePolyline, simplify } from './polyline.mjs';
 
 // Parse an activity file (FIT, GPX, or TCX) and return a normalized activity object.
 export async function parseActivityFile(buffer, filename) {
@@ -84,6 +85,17 @@ function parseFIT(buffer) {
         activity.power_analysis = analysis;
       }
 
+      // Extract GPS track and encode as polyline
+      if (records.length > 0 && records.some(r => r.position_lat != null)) {
+        const coords = records
+          .filter(r => r.position_lat != null && r.position_long != null)
+          .map(r => [r.position_lat, r.position_long]);
+        if (coords.length > 1) {
+          const simplified = simplify(coords, 0.00003);
+          activity.route_polyline = encodePolyline(simplified);
+        }
+      }
+
       // Convert start_date to ISO string
       if (activity.start_date instanceof Date) {
         activity.start_date = activity.start_date.toISOString();
@@ -149,9 +161,12 @@ function parseGPX(buffer) {
   let cadSum = 0, cadCount = 0;
   let powerSum = 0, powerCount = 0, powerMax = 0;
   const speeds = [];
+  const gpsCoords = [];
 
   for (let i = 0; i < points.length; i++) {
     const pt = points[i];
+    const ptLat = parseFloat(pt['@_lat']), ptLon = parseFloat(pt['@_lon']);
+    if (!isNaN(ptLat) && !isNaN(ptLon)) gpsCoords.push([ptLat, ptLon]);
 
     if (i > 0) {
       const prev = points[i - 1];
@@ -215,6 +230,7 @@ function parseGPX(buffer) {
     calories: null,
     lap_data: null,
     power_curve: null,
+    route_polyline: gpsCoords.length > 1 ? encodePolyline(simplify(gpsCoords, 0.00003)) : null,
   };
 }
 

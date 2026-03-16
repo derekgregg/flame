@@ -369,6 +369,14 @@ header p {
   font-weight: bold;
 }
 
+/* Activity map */
+.activity-map {
+  height: 200px;
+  border-radius: 6px;
+  margin-bottom: 12px;
+  border: 1px solid var(--border);
+}
+
 .roast {
   background: linear-gradient(135deg, rgba(255, 69, 0, 0.08), rgba(57, 255, 20, 0.05));
   border-left: 3px solid var(--flame);

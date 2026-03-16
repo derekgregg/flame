@@ -176,5 +176,6 @@ export function normalizeActivity(stravaActivity) {
     average_heartrate: stravaActivity.average_heartrate || null,
     suffer_score: stravaActivity.suffer_score || null,
     external_id: stravaActivity.external_id || null,
+    route_polyline: stravaActivity.map?.polyline || stravaActivity.map?.summary_polyline || null,
   };
 }
