@@ -93,7 +93,6 @@ export async function processActivity({ userId, platform, platformActivityId, ac
   // Keep legacy athlete_id for Strava during migration
   if (platform === 'strava') {
     row.athlete_id = parseInt(platformActivityId) || null;
-    row.id = parseInt(platformActivityId) || undefined;
   }
 
   const { data: inserted, error } = await db
