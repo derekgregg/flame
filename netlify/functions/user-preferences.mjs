@@ -7,7 +7,7 @@ export default async (req) => {
   }
 
   const body = await req.json();
-  const { share_with_group, weight, ftp, display_name, userId: bodyUserId, athleteId } = body;
+  const { share_with_group, weight, height, ftp, display_name, userId: bodyUserId, athleteId } = body;
 
   // Accept either session cookie or explicit userId (for backwards compat)
   let userId = getUserIdFromRequest(req);
@@ -36,6 +36,7 @@ export default async (req) => {
   const updates = {};
   if (share_with_group !== undefined) updates.share_with_group = share_with_group;
   if (weight !== undefined) updates.weight = weight > 0 ? weight : null;
+  if (height !== undefined) updates.height = height > 0 ? height : null;
   if (ftp !== undefined) updates.ftp = ftp > 0 ? ftp : null;
   if (display_name) updates.display_name = display_name;
   updates.updated_at = new Date().toISOString();

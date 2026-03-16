@@ -7,6 +7,7 @@ CREATE TABLE users (
   display_name TEXT NOT NULL,
   profile_pic TEXT,
   weight REAL,
+  height REAL,
   ftp INTEGER,
   share_with_group BOOLEAN DEFAULT false,
   is_tracked BOOLEAN DEFAULT true,

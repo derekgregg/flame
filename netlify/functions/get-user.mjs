@@ -23,6 +23,7 @@ export default async (req) => {
       display_name: user.display_name,
       profile_pic: user.profile_pic,
       weight: user.weight,
+      height: user.height,
       ftp: user.ftp,
       share_with_group: user.share_with_group,
     },

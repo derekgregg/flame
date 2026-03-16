@@ -37,6 +37,10 @@ async function loadSettings() {
           <input type="text" id="display-name" value="${user.display_name || ''}" placeholder="Your name">
         </div>
         <div class="settings-field">
+          <label for="height-input">Height (cm) <span class="text-muted">— so Le Directeur knows if you're a climber or a sprinter build</span></label>
+          <input type="number" id="height-input" value="${user.height || ''}" min="120" max="220" step="1" placeholder="e.g. 183">
+        </div>
+        <div class="settings-field">
           <label for="weight-input">Weight (kg) <span class="text-muted">— for power-to-weight commentary</span></label>
           <input type="number" id="weight-input" value="${user.weight || ''}" min="30" max="200" step="0.1" placeholder="e.g. 75">
         </div>
@@ -114,6 +118,10 @@ async function saveProfile() {
     display_name: document.getElementById('display-name').value.trim(),
     share_with_group: document.getElementById('share-toggle').checked,
   };
+
+  const h = parseFloat(document.getElementById('height-input').value);
+  if (h > 0) body.height = h;
+  else body.height = 0;
 
   const w = parseFloat(document.getElementById('weight-input').value);
   if (w > 0) body.weight = w;

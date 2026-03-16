@@ -88,6 +88,19 @@ function buildPrompt(activity, athlete) {
   const timeDiff = activity.elapsed_time - activity.moving_time;
   if (timeDiff > 60) stats.push(`Time spent stopped: ${formatDuration(timeDiff)}`);
 
+  // Athlete build context
+  if (activity.athlete_height && activity.athlete_weight) {
+    const heightM = activity.athlete_height / 100;
+    const bmi = (activity.athlete_weight / (heightM * heightM)).toFixed(1);
+    stats.push(`Athlete build: ${activity.athlete_height}cm, ${activity.athlete_weight}kg (BMI ${bmi})`);
+    // For cycling context: pro climbers are ~18-20 BMI, sprinters 22-24, most amateurs 23-28
+    if (activity.athlete_weight > 85) {
+      stats.push(`Note: at ${activity.athlete_weight}kg, this rider is carrying extra weight on climbs — every kg costs ~2.5s per km at 7% grade`);
+    }
+  } else if (activity.athlete_weight) {
+    stats.push(`Athlete weight: ${activity.athlete_weight}kg`);
+  }
+
   // Athlete FTP context
   if (activity.athlete_ftp) {
     stats.push(`Athlete FTP: ${activity.athlete_ftp}W`);

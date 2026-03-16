@@ -168,6 +168,7 @@ export async function processActivity({ userId, platform, platformActivityId, ac
   // Generate commentary
   try {
     if (user?.weight) activity.athlete_weight = user.weight;
+    if (user?.height) activity.athlete_height = user.height;
     if (user?.ftp) activity.athlete_ftp = user.ftp;
     const roast = await generateRoast(activity, {
       firstname: user?.display_name?.split(' ')[0] || '?',
