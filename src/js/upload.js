@@ -112,7 +112,12 @@ function setupUpload() {
 
     try {
       const buffer = await selectedFile.arrayBuffer();
-      const base64 = btoa(String.fromCharCode(...new Uint8Array(buffer)));
+      const bytes = new Uint8Array(buffer);
+      let binary = '';
+      for (let i = 0; i < bytes.length; i++) {
+        binary += String.fromCharCode(bytes[i]);
+      }
+      const base64 = btoa(binary);
 
       const res = await fetch('/api/upload-activity', {
         method: 'POST',
@@ -123,6 +128,14 @@ function setupUpload() {
           name: nameInput.value.trim() || undefined,
         }),
       });
+
+      if (!res.ok) {
+        const errData = await res.json().catch(() => ({}));
+        showStatus('error', errData.error || `Server error (${res.status})`);
+        uploadBtn.disabled = false;
+        uploadBtn.textContent = 'Upload & Analyze';
+        return;
+      }
 
       const data = await res.json();
       if (data.error) {
