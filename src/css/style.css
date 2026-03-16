@@ -516,6 +516,15 @@ footer img {
   opacity: 0.6;
 }
 
+.footer-link {
+  display: inline-block;
+  margin-top: 12px;
+  color: var(--text-muted);
+  font-size: 0.75rem;
+}
+
+.footer-link:hover { color: var(--toxic); }
+
 /* Loading */
 .loading {
   text-align: center;

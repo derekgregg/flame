@@ -61,7 +61,7 @@ All secrets are in `.env` (gitignored) and set in Netlify dashboard:
 
 - **Production deploys from the `deploy` branch only.** Pushes to `main` do NOT trigger Netlify deploys. When ready to deploy, merge `main` into `deploy` and push: `git checkout deploy && git merge main && git push origin deploy && git checkout main`
 - Day-to-day development happens on `main`. Push freely without burning build credits.
-- The Netlify site is `le-directeur.netlify.app`.
+- The Netlify site is `le-directeur.netlify.app` with custom domain `ledirecteur.app`.
 
 ## Key Architecture Decisions
 

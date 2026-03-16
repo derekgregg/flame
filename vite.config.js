@@ -12,6 +12,7 @@ export default defineConfig({
         admin: resolve(__dirname, 'src/admin.html'),
         callback: resolve(__dirname, 'src/callback.html'),
         settings: resolve(__dirname, 'src/settings.html'),
+        privacy: resolve(__dirname, 'src/privacy.html'),
       },
     },
   },
