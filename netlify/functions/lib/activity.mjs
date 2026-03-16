@@ -28,13 +28,13 @@ export async function processActivity({ userId, platform, platformActivityId, ac
     const updates = { platform_links: mergedLinks };
 
     // Fill in missing data from the new source (richer source wins per field)
-    if (!existing?.average_watts && activity.average_watts) updates.average_watts = activity.average_watts;
-    if (!existing?.max_watts && activity.max_watts) updates.max_watts = activity.max_watts;
-    if (!existing?.suffer_score && activity.suffer_score) updates.suffer_score = activity.suffer_score;
-    if (!existing?.avg_heart_rate && activity.average_heartrate) updates.avg_heart_rate = activity.average_heartrate;
-    if (!existing?.max_heart_rate && activity.max_heartrate) updates.max_heart_rate = activity.max_heartrate;
-    if (!existing?.avg_cadence && activity.avg_cadence) updates.avg_cadence = activity.avg_cadence;
-    if (!existing?.normalized_power && activity.normalized_power) updates.normalized_power = activity.normalized_power;
+    if (!existing?.average_watts && activity.average_watts) updates.average_watts = Math.round(activity.average_watts);
+    if (!existing?.max_watts && activity.max_watts) updates.max_watts = Math.round(activity.max_watts);
+    if (!existing?.suffer_score && activity.suffer_score) updates.suffer_score = Math.round(activity.suffer_score);
+    if (!existing?.avg_heart_rate && activity.average_heartrate) updates.avg_heart_rate = Math.round(activity.average_heartrate);
+    if (!existing?.max_heart_rate && activity.max_heartrate) updates.max_heart_rate = Math.round(activity.max_heartrate);
+    if (!existing?.avg_cadence && activity.avg_cadence) updates.avg_cadence = Math.round(activity.avg_cadence);
+    if (!existing?.normalized_power && activity.normalized_power) updates.normalized_power = Math.round(activity.normalized_power);
     if (!existing?.lap_data && activity.lap_data) updates.lap_data = activity.lap_data;
     if (!existing?.enrichment_data && activity.power_curve) {
       updates.enrichment_data = { power_curve: activity.power_curve };
@@ -68,9 +68,9 @@ export async function processActivity({ userId, platform, platformActivityId, ac
     elevation_gain: activity.total_elevation_gain,
     average_speed: activity.average_speed,
     max_speed: activity.max_speed,
-    average_watts: activity.average_watts || null,
-    max_watts: activity.max_watts || null,
-    suffer_score: activity.suffer_score || null,
+    average_watts: activity.average_watts ? Math.round(activity.average_watts) : null,
+    max_watts: activity.max_watts ? Math.round(activity.max_watts) : null,
+    suffer_score: activity.suffer_score ? Math.round(activity.suffer_score) : null,
     start_date: activity.start_date,
     sport_type: activity.sport_type,
     dedup_key: dedupKey,
@@ -80,12 +80,12 @@ export async function processActivity({ userId, platform, platformActivityId, ac
     source_platform: platform,
     source_activity_id: platformActivityId,
     // Enrichment fields
-    normalized_power: activity.normalized_power || null,
-    avg_cadence: activity.avg_cadence || null,
-    max_cadence: activity.max_cadence || null,
-    avg_heart_rate: activity.average_heartrate || null,
-    max_heart_rate: activity.max_heartrate || null,
-    calories: activity.calories || null,
+    normalized_power: activity.normalized_power ? Math.round(activity.normalized_power) : null,
+    avg_cadence: activity.avg_cadence ? Math.round(activity.avg_cadence) : null,
+    max_cadence: activity.max_cadence ? Math.round(activity.max_cadence) : null,
+    avg_heart_rate: activity.average_heartrate ? Math.round(activity.average_heartrate) : null,
+    max_heart_rate: activity.max_heartrate ? Math.round(activity.max_heartrate) : null,
+    calories: activity.calories ? Math.round(activity.calories) : null,
     lap_data: activity.lap_data || null,
     enrichment_data: activity.power_curve ? { power_curve: activity.power_curve } : null,
   };
