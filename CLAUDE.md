@@ -55,12 +55,13 @@ All changes must comply with Strava's API Agreement and Brand Guidelines. Violat
 
 All secrets are in `.env` (gitignored) and set in Netlify dashboard:
 
-`STRAVA_CLIENT_ID`, `STRAVA_CLIENT_SECRET`, `STRAVA_VERIFY_TOKEN`, `SUPABASE_URL`, `SUPABASE_SERVICE_KEY`, `ANTHROPIC_API_KEY`, `ADMIN_SECRET`, `ADMIN_ATHLETE_ID`, `SITE_URL`
+`STRAVA_CLIENT_ID`, `STRAVA_CLIENT_SECRET`, `STRAVA_VERIFY_TOKEN`, `SUPABASE_URL`, `SUPABASE_SERVICE_KEY`, `ANTHROPIC_API_KEY`, `ADMIN_SECRET`, `ADMIN_ATHLETE_ID`, `SITE_URL`, `JWT_SECRET`, `WAHOO_CLIENT_ID`, `WAHOO_CLIENT_SECRET`, `WAHOO_WEBHOOK_TOKEN`, `GARMIN_CLIENT_ID`, `GARMIN_CLIENT_SECRET`
 
 ## Git / Deployment
 
-- **Batch commits before pushing.** Every push to `main` triggers a Netlify deploy which uses build credits. Accumulate changes locally and push once when ready, rather than pushing after every small commit.
-- Deploys are automatic from `main` via GitHub integration.
+- **Production deploys from the `deploy` branch only.** Pushes to `main` do NOT trigger Netlify deploys. When ready to deploy, merge `main` into `deploy` and push: `git checkout deploy && git merge main && git push origin deploy && git checkout main`
+- Day-to-day development happens on `main`. Push freely without burning build credits.
+- The Netlify site is `le-directeur.netlify.app`.
 
 ## Key Architecture Decisions
 

@@ -41,21 +41,29 @@ function platformBadge(platform) {
   return `<span class="platform-badge ${classes[platform] || ''}">${labels[platform] || platform}</span>`;
 }
 
-function activityLink(activity) {
-  const platform = activity.source_platform || 'strava';
-  const sourceId = activity.source_activity_id || activity.id;
+function activityLinks(activity) {
+  const links = activity.platform_links || {};
+  const fallbackPlatform = activity.source_platform || 'strava';
+  const fallbackId = activity.source_activity_id || activity.id;
 
-  if (platform === 'strava') {
-    return `<a href="https://www.strava.com/activities/${sourceId}" target="_blank" rel="noopener" class="view-on-strava">View on Strava</a>`;
+  // Ensure at least the primary source is in the links
+  if (!Object.keys(links).length) {
+    links[fallbackPlatform] = String(fallbackId);
   }
-  if (platform === 'wahoo') {
-    return `<span class="platform-attr">Recorded with Wahoo</span>`;
+
+  const parts = [];
+
+  if (links.strava) {
+    parts.push(`<a href="https://www.strava.com/activities/${links.strava}" target="_blank" rel="noopener" class="view-on-strava">View on Strava</a>`);
   }
-  if (platform === 'garmin') {
-    const device = activity.garmin_device ? ` ${activity.garmin_device}` : '';
-    return `<span class="platform-attr">Recorded with Garmin${device}</span>`;
+  if (links.garmin) {
+    parts.push(`<a href="https://connect.garmin.com/modern/activity/${links.garmin}" target="_blank" rel="noopener" class="view-on-garmin">View on Garmin</a>`);
   }
-  return '';
+  if (links.wahoo) {
+    parts.push(`<span class="view-on-wahoo">Recorded with Wahoo</span>`);
+  }
+
+  return parts.join(' ');
 }
 
 function renderCard(a) {
@@ -90,7 +98,7 @@ function renderCard(a) {
       <div class="activity-name">"${a.name}"</div>
       <div class="stats-grid">${statsHTML}</div>
       <div class="roast">${a.roast}</div>
-      ${activityLink(a)}
+      ${activityLinks(a)}
     </div>
   `;
 }

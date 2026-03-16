@@ -271,12 +271,25 @@ header p {
   opacity: 0.85;
 }
 
-/* Platform attribution */
-.platform-attr {
+/* Platform links */
+.view-on-garmin {
   display: inline-block;
   margin-top: 12px;
-  color: var(--text-muted);
+  color: var(--garmin-green);
+  font-weight: bold;
+  font-size: 0.8rem;
+  text-decoration: underline;
+  margin-left: 12px;
+}
+
+.view-on-garmin:hover { opacity: 0.85; }
+
+.view-on-wahoo {
+  display: inline-block;
+  margin-top: 12px;
+  color: var(--wahoo-blue);
   font-size: 0.75rem;
+  margin-left: 12px;
 }
 
 /* Settings page */

@@ -76,11 +76,10 @@ export async function findDuplicate(userId, activity, sourcePlatform, sourceActi
   return null;
 }
 
-// Source priority: prefer the platform with richer data.
-// Returns true if newSource should replace existingSource.
+// Source priority for choosing which platform's data to use as primary.
+// Strava is highest because of "View on Strava" link requirement.
 const PRIORITY = { garmin: 1, wahoo: 2, strava: 3 };
 
-export function shouldReplace(existingSource, newSource) {
-  // Strava is highest priority because of "View on Strava" link requirement
+export function shouldBecomePrimary(existingSource, newSource) {
   return (PRIORITY[newSource] || 0) > (PRIORITY[existingSource] || 0);
 }
