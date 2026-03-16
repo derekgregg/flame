@@ -1,7 +1,10 @@
 const leaderboard = document.getElementById('leaderboard');
-const filterAthlete = document.getElementById('filter-athlete');
+const filterUser = document.getElementById('filter-user');
 const filterSport = document.getElementById('filter-sport');
 const sortBy = document.getElementById('sort-by');
+const userNav = document.getElementById('user-nav');
+const userGreeting = document.getElementById('user-greeting');
+const connectButtons = document.getElementById('connect-buttons');
 
 function formatDistance(meters) {
   if (!meters || meters === 0) return '--';
@@ -32,10 +35,36 @@ function formatDate(iso) {
   });
 }
 
-function renderCard(a) {
-  const athlete = a.athletes;
-  const stats = [];
+function platformBadge(platform) {
+  const labels = { strava: 'Strava', wahoo: 'Wahoo', garmin: 'Garmin' };
+  const classes = { strava: 'badge-strava', wahoo: 'badge-wahoo', garmin: 'badge-garmin' };
+  return `<span class="platform-badge ${classes[platform] || ''}">${labels[platform] || platform}</span>`;
+}
 
+function activityLink(activity) {
+  const platform = activity.source_platform || 'strava';
+  const sourceId = activity.source_activity_id || activity.id;
+
+  if (platform === 'strava') {
+    return `<a href="https://www.strava.com/activities/${sourceId}" target="_blank" rel="noopener" class="view-on-strava">View on Strava</a>`;
+  }
+  if (platform === 'wahoo') {
+    return `<span class="platform-attr">Recorded with Wahoo</span>`;
+  }
+  if (platform === 'garmin') {
+    const device = activity.garmin_device ? ` ${activity.garmin_device}` : '';
+    return `<span class="platform-attr">Recorded with Garmin${device}</span>`;
+  }
+  return '';
+}
+
+function renderCard(a) {
+  // Support both new (users) and legacy (athletes) schema
+  const user = a.users || a.athletes;
+  const displayName = user?.display_name || `${user?.firstname || '?'} ${user?.lastname || ''}`;
+  const profilePic = user?.profile_pic || '';
+
+  const stats = [];
   if (a.distance > 0) stats.push({ label: 'Distance', value: formatDistance(a.distance) });
   stats.push({ label: 'Time', value: formatDuration(a.moving_time) });
   if (a.average_speed > 0) stats.push({ label: 'Avg Speed', value: formatSpeed(a.average_speed) });
@@ -47,25 +76,59 @@ function renderCard(a) {
     .map((s) => `<div class="stat"><div class="stat-label">${s.label}</div><div class="stat-value">${s.value}</div></div>`)
     .join('');
 
+  const platform = a.source_platform || 'strava';
+
   return `
     <div class="activity-card">
       <div class="card-header">
-        <img src="${athlete?.profile_pic || ''}" alt="" onerror="this.style.display='none'">
-        <span class="athlete-name">${athlete?.firstname || '?'} ${athlete?.lastname || ''}</span>
+        ${profilePic ? `<img src="${profilePic}" alt="" onerror="this.style.display='none'">` : ''}
+        <span class="athlete-name">${displayName}</span>
         <span class="activity-date">${formatDate(a.start_date)}</span>
+        ${platformBadge(platform)}
         <span class="activity-type">${a.sport_type}</span>
       </div>
       <div class="activity-name">"${a.name}"</div>
       <div class="stats-grid">${statsHTML}</div>
       <div class="roast">${a.roast}</div>
-      <a href="https://www.strava.com/activities/${a.id}" target="_blank" rel="noopener" class="view-on-strava">View on Strava</a>
+      ${activityLink(a)}
     </div>
   `;
 }
 
+async function checkAuth() {
+  try {
+    const res = await fetch('/api/get-user');
+    const data = await res.json();
+    if (data.user) {
+      userNav.classList.remove('hidden');
+      userGreeting.textContent = data.user.display_name;
+      // Hide connect buttons for already-connected platforms
+      if (data.connections) {
+        const connected = data.connections.map(c => c.platform);
+        if (connected.includes('strava')) {
+          const btn = document.querySelector('.strava-btn');
+          if (btn) btn.classList.add('hidden');
+        }
+        if (connected.includes('wahoo')) {
+          const btn = document.querySelector('.wahoo-btn');
+          if (btn) btn.classList.add('hidden');
+        }
+        if (connected.includes('garmin')) {
+          const btn = document.querySelector('.garmin-btn');
+          if (btn) btn.classList.add('hidden');
+        }
+        // If all connected, hide the connect buttons container
+        if (connected.length >= 3) connectButtons.classList.add('hidden');
+      }
+    }
+  } catch {
+    // Not logged in — that's fine
+  }
+}
+
 async function loadLeaderboard() {
   const params = new URLSearchParams();
-  if (filterAthlete.value) params.set('athlete_id', filterAthlete.value);
+  if (filterUser.value) params.set('user_id', filterUser.value);
   if (filterSport.value) params.set('sport_type', filterSport.value);
   if (sortBy.value) params.set('sort', sortBy.value);
 
@@ -75,18 +138,19 @@ async function loadLeaderboard() {
     const res = await fetch(`/api/get-leaderboard?${params}`);
     const data = await res.json();
 
-    // Populate athlete filter
-    if (data.athletes && filterAthlete.options.length <= 1) {
-      for (const a of data.athletes) {
+    // Populate user filter
+    const users = data.users || data.athletes || [];
+    if (users.length && filterUser.options.length <= 1) {
+      for (const u of users) {
         const opt = document.createElement('option');
-        opt.value = a.id;
-        opt.textContent = `${a.firstname} ${a.lastname}`;
-        filterAthlete.appendChild(opt);
+        opt.value = u.id;
+        opt.textContent = u.display_name || `${u.firstname} ${u.lastname}`;
+        filterUser.appendChild(opt);
       }
     }
 
     if (!data.activities?.length) {
-      leaderboard.innerHTML = '<div class="empty-state"><p>No roasts yet. Connect your Strava and go for a ride (or a gentle stroll — we judge those too).</p></div>';
+      leaderboard.innerHTML = '<div class="empty-state"><p>No roasts yet. Connect a platform and go for a ride (or a gentle stroll — we judge those too).</p></div>';
       return;
     }
 
@@ -97,8 +161,9 @@ async function loadLeaderboard() {
   }
 }
 
-filterAthlete.addEventListener('change', loadLeaderboard);
+filterUser.addEventListener('change', loadLeaderboard);
 filterSport.addEventListener('change', loadLeaderboard);
 sortBy.addEventListener('change', loadLeaderboard);
 
+checkAuth();
 loadLeaderboard();

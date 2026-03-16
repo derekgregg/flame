@@ -15,6 +15,9 @@
   --toxic-dim: #1a7a0a;
   --flame: #ff4500;
   --flame-dim: #7a2200;
+  --strava-orange: #FC5200;
+  --wahoo-blue: #2D9CDB;
+  --garmin-green: #00B0B9;
 }
 
 body {
@@ -26,6 +29,9 @@ body {
 
 a { color: var(--toxic); text-decoration: none; }
 a:hover { text-decoration: underline; }
+
+.hidden { display: none !important; }
+.text-muted { color: var(--text-muted); }
 
 .container {
   max-width: 900px;
@@ -54,12 +60,30 @@ header p {
   font-size: 0.85rem;
 }
 
+/* User nav */
+.user-nav {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 16px;
+  margin-bottom: 16px;
+  font-size: 0.85rem;
+}
+
+.nav-link {
+  color: var(--text-muted);
+  font-size: 0.8rem;
+}
+
+.nav-link:hover { color: var(--toxic); }
+
 /* Controls */
 .controls {
   display: flex;
   gap: 12px;
   margin-bottom: 24px;
   flex-wrap: wrap;
+  align-items: center;
 }
 
 .controls select,
@@ -77,6 +101,68 @@ header p {
 .controls select:hover,
 .controls button:hover {
   border-color: var(--toxic);
+}
+
+/* Connect Buttons */
+.connect-buttons {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin-left: auto;
+}
+
+.connect-btn {
+  display: inline-block;
+  background: var(--flame);
+  color: white;
+  padding: 10px 20px;
+  border-radius: 6px;
+  font-weight: bold;
+  font-family: inherit;
+  font-size: 0.85rem;
+  border: none;
+  cursor: pointer;
+  transition: opacity 0.2s;
+  text-decoration: none;
+}
+
+.connect-btn:hover {
+  opacity: 0.85;
+  text-decoration: none;
+}
+
+.connect-btn.small {
+  padding: 6px 14px;
+  font-size: 0.75rem;
+}
+
+.strava-btn { background: var(--strava-orange); }
+.wahoo-btn { background: var(--wahoo-blue); }
+.garmin-btn { background: var(--garmin-green); }
+
+/* Platform badges */
+.platform-badge {
+  padding: 2px 8px;
+  border-radius: 3px;
+  font-size: 0.65rem;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  font-weight: bold;
+}
+
+.badge-strava {
+  background: rgba(252, 82, 0, 0.15);
+  color: var(--strava-orange);
+}
+
+.badge-wahoo {
+  background: rgba(45, 156, 219, 0.15);
+  color: var(--wahoo-blue);
+}
+
+.badge-garmin {
+  background: rgba(0, 176, 185, 0.15);
+  color: var(--garmin-green);
 }
 
 /* Activity Cards */
@@ -185,24 +271,128 @@ header p {
   opacity: 0.85;
 }
 
-/* Connect Button */
-.connect-btn {
+/* Platform attribution */
+.platform-attr {
   display: inline-block;
-  background: var(--flame);
-  color: white;
-  padding: 12px 28px;
-  border-radius: 6px;
-  font-weight: bold;
-  font-family: inherit;
-  font-size: 0.9rem;
-  border: none;
-  cursor: pointer;
-  transition: opacity 0.2s;
+  margin-top: 12px;
+  color: var(--text-muted);
+  font-size: 0.75rem;
 }
 
-.connect-btn:hover {
-  opacity: 0.85;
-  text-decoration: none;
+/* Settings page */
+.settings-section {
+  margin-bottom: 32px;
+}
+
+.settings-section h2 {
+  font-size: 1.1rem;
+  color: var(--toxic);
+  margin-bottom: 12px;
+  padding-bottom: 8px;
+  border-bottom: 1px solid var(--border);
+}
+
+.settings-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 20px;
+}
+
+.settings-field {
+  margin-bottom: 16px;
+}
+
+.settings-field label {
+  display: block;
+  margin-bottom: 6px;
+  font-size: 0.85rem;
+  font-weight: bold;
+}
+
+.settings-field input[type="text"],
+.settings-field input[type="number"] {
+  background: var(--bg);
+  border: 1px solid var(--border);
+  color: var(--text);
+  padding: 8px 12px;
+  font-family: inherit;
+  font-size: 0.9rem;
+  border-radius: 4px;
+  width: 100%;
+  max-width: 300px;
+}
+
+.checkbox-label {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  cursor: pointer;
+}
+
+.checkbox-label input[type="checkbox"] {
+  width: 20px;
+  height: 20px;
+  accent-color: var(--toxic);
+}
+
+/* Platform rows in settings */
+.platform-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 0;
+  border-bottom: 1px solid var(--border);
+}
+
+.platform-row:last-child {
+  border-bottom: none;
+}
+
+.platform-name {
+  font-weight: bold;
+  flex: 1;
+}
+
+.disconnect-btn {
+  background: var(--surface);
+  border: 1px solid var(--flame);
+  color: var(--flame);
+  padding: 6px 12px;
+  font-family: inherit;
+  font-size: 0.75rem;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.disconnect-btn:hover {
+  background: var(--flame-dim);
+}
+
+/* Feed items */
+.feed-item {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 16px;
+  margin-bottom: 12px;
+}
+
+.feed-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 8px;
+}
+
+.feed-name {
+  font-weight: bold;
+  flex: 1;
+}
+
+.feed-date {
+  color: var(--text-muted);
+  font-size: 0.8rem;
 }
 
 /* Admin Panel */
@@ -300,6 +490,13 @@ footer {
   margin-top: 40px;
 }
 
+.footer-logos {
+  display: flex;
+  justify-content: center;
+  gap: 16px;
+  align-items: center;
+}
+
 footer img {
   height: 24px;
   margin-top: 8px;
@@ -317,6 +514,9 @@ footer img {
 @media (max-width: 600px) {
   header h1 { font-size: 1.8rem; }
   .controls { flex-direction: column; }
+  .connect-buttons { margin-left: 0; width: 100%; }
+  .connect-btn { width: 100%; text-align: center; }
   .stats-grid { grid-template-columns: repeat(2, 1fr); }
   .card-header { flex-wrap: wrap; }
+  .platform-row { flex-wrap: wrap; }
 }

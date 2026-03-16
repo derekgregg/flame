@@ -1,0 +1,182 @@
+const content = document.getElementById('settings-content');
+
+async function loadSettings() {
+  let data;
+  try {
+    const res = await fetch('/api/get-user');
+    data = await res.json();
+  } catch {
+    content.innerHTML = '<div class="empty-state"><p>Failed to load settings.</p></div>';
+    return;
+  }
+
+  if (!data.user) {
+    content.innerHTML = `
+      <div class="empty-state">
+        <p>You're not logged in. Connect a platform to get started.</p>
+        <div class="connect-buttons" style="margin-top: 20px; justify-content: center;">
+          <a href="/api/strava-auth" class="connect-btn strava-btn">Connect Strava</a>
+          <a href="/api/wahoo-auth" class="connect-btn wahoo-btn">Connect Wahoo</a>
+          <a href="/api/garmin-auth" class="connect-btn garmin-btn">Connect Garmin</a>
+        </div>
+      </div>
+    `;
+    return;
+  }
+
+  const user = data.user;
+  const connections = data.connections || [];
+  const connectedPlatforms = connections.map(c => c.platform);
+
+  content.innerHTML = `
+    <div class="settings-section">
+      <h2>Profile</h2>
+      <div class="settings-card">
+        <div class="settings-field">
+          <label for="display-name">Display Name</label>
+          <input type="text" id="display-name" value="${user.display_name || ''}" placeholder="Your name">
+        </div>
+        <div class="settings-field">
+          <label for="weight-input">Weight (kg) <span class="text-muted">— for power-to-weight roasts</span></label>
+          <input type="number" id="weight-input" value="${user.weight || ''}" min="30" max="200" step="0.1" placeholder="e.g. 75">
+        </div>
+        <div class="settings-field">
+          <label class="checkbox-label">
+            <input type="checkbox" id="share-toggle" ${user.share_with_group ? 'checked' : ''}>
+            <span>Share my activities with the group leaderboard</span>
+          </label>
+        </div>
+        <button id="save-profile" class="connect-btn">Save Profile</button>
+      </div>
+    </div>
+
+    <div class="settings-section">
+      <h2>Connected Platforms</h2>
+      <div class="settings-card">
+        ${renderPlatformRow('strava', 'Strava', connectedPlatforms, connections)}
+        ${renderPlatformRow('wahoo', 'Wahoo', connectedPlatforms, connections)}
+        ${renderPlatformRow('garmin', 'Garmin', connectedPlatforms, connections)}
+      </div>
+    </div>
+
+    <div class="settings-section">
+      <h2>My Feed</h2>
+      <div id="my-feed">
+        <div class="loading">Loading your activities...</div>
+      </div>
+    </div>
+  `;
+
+  // Bind events
+  document.getElementById('save-profile').addEventListener('click', saveProfile);
+
+  document.querySelectorAll('.disconnect-btn').forEach(btn => {
+    btn.addEventListener('click', () => disconnectPlatform(btn.dataset.platform));
+  });
+
+  loadFeed();
+}
+
+function renderPlatformRow(platform, label, connected, connections) {
+  const isConnected = connected.includes(platform);
+  const conn = connections.find(c => c.platform === platform);
+
+  if (isConnected) {
+    const date = conn ? new Date(conn.connected_at).toLocaleDateString() : '';
+    return `
+      <div class="platform-row">
+        <span class="platform-name">${label}</span>
+        <span class="badge-tracked">Connected ${date}</span>
+        <button class="disconnect-btn danger" data-platform="${platform}">Disconnect</button>
+      </div>
+    `;
+  }
+
+  return `
+    <div class="platform-row">
+      <span class="platform-name">${label}</span>
+      <span class="badge-untracked">Not connected</span>
+      <a href="/api/${platform}-auth" class="connect-btn small">Connect</a>
+    </div>
+  `;
+}
+
+async function saveProfile() {
+  const btn = document.getElementById('save-profile');
+  btn.textContent = 'Saving...';
+  btn.disabled = true;
+
+  const body = {
+    display_name: document.getElementById('display-name').value.trim(),
+    share_with_group: document.getElementById('share-toggle').checked,
+  };
+
+  const w = parseFloat(document.getElementById('weight-input').value);
+  if (w > 0) body.weight = w;
+  else body.weight = 0;
+
+  try {
+    await fetch('/api/user-preferences', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(body),
+    });
+    btn.textContent = 'Saved!';
+    setTimeout(() => {
+      btn.textContent = 'Save Profile';
+      btn.disabled = false;
+    }, 1500);
+  } catch (err) {
+    console.error('Save failed:', err);
+    btn.textContent = 'Save Profile';
+    btn.disabled = false;
+  }
+}
+
+async function disconnectPlatform(platform) {
+  if (!confirm(`Disconnect ${platform}? This will remove all ${platform}-sourced activities.`)) return;
+
+  try {
+    const res = await fetch('/api/disconnect-platform', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ platform }),
+    });
+    const data = await res.json();
+    if (data.error) {
+      alert(data.error);
+    } else {
+      loadSettings(); // Refresh
+    }
+  } catch (err) {
+    console.error('Disconnect failed:', err);
+  }
+}
+
+async function loadFeed() {
+  const feed = document.getElementById('my-feed');
+  try {
+    const res = await fetch('/api/get-feed');
+    const data = await res.json();
+
+    if (!data.activities?.length) {
+      feed.innerHTML = '<p class="text-muted">No activities yet. Connect a platform and go ride!</p>';
+      return;
+    }
+
+    feed.innerHTML = data.activities.map(a => `
+      <div class="feed-item">
+        <div class="feed-header">
+          <span class="feed-name">${a.name}</span>
+          <span class="feed-date">${new Date(a.start_date).toLocaleDateString()}</span>
+          <span class="platform-badge badge-${a.source_platform || 'strava'}">${a.source_platform || 'strava'}</span>
+        </div>
+        ${a.roast ? `<div class="roast">${a.roast}</div>` : ''}
+      </div>
+    `).join('');
+  } catch {
+    feed.innerHTML = '<p class="text-muted">Failed to load feed.</p>';
+  }
+}
+
+loadSettings();

@@ -11,6 +11,7 @@ export default defineConfig({
         main: resolve(__dirname, 'src/index.html'),
         admin: resolve(__dirname, 'src/admin.html'),
         callback: resolve(__dirname, 'src/callback.html'),
+        settings: resolve(__dirname, 'src/settings.html'),
       },
     },
   },

@@ -1,6 +1,6 @@
 import { randomBytes } from 'crypto';
 import { getSupabase } from './lib/supabase.mjs';
-import { getOAuthURL } from './lib/strava.mjs';
+import { getOAuthURL } from './lib/wahoo.mjs';
 import { getUserIdFromRequest } from './lib/auth.mjs';
 
 export default async (req) => {
@@ -8,10 +8,9 @@ export default async (req) => {
   const state = randomBytes(16).toString('hex');
   const userId = getUserIdFromRequest(req);
 
-  // Store state for CSRF protection and user linking
   await db.from('oauth_state').insert({
     state,
-    platform: 'strava',
+    platform: 'wahoo',
     user_id: userId || null,
   });
 

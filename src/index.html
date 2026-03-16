@@ -14,8 +14,13 @@
       <p>Your group's activities, roasted mercilessly</p>
     </header>
 
+    <nav id="user-nav" class="user-nav hidden">
+      <span id="user-greeting"></span>
+      <a href="/settings.html" class="nav-link">Settings</a>
+    </nav>
+
     <div class="controls">
-      <select id="filter-athlete">
+      <select id="filter-user">
         <option value="">All Athletes</option>
       </select>
       <select id="filter-sport">
@@ -34,7 +39,11 @@
         <option value="moving_time">Duration</option>
         <option value="elevation_gain">Elevation</option>
       </select>
-      <a href="/api/strava-auth" class="connect-btn">Connect Strava</a>
+      <div id="connect-buttons" class="connect-buttons">
+        <a href="/api/strava-auth" class="connect-btn strava-btn">Connect Strava</a>
+        <a href="/api/wahoo-auth" class="connect-btn wahoo-btn">Connect Wahoo</a>
+        <a href="/api/garmin-auth" class="connect-btn garmin-btn">Connect Garmin</a>
+      </div>
     </div>
 
     <div id="leaderboard">
@@ -42,9 +51,11 @@
     </div>
 
     <footer>
-      <a href="https://www.strava.com" target="_blank" rel="noopener">
-        <img src="/images/api_logo_pwrdBy_strava_horiz_white.svg" alt="Powered by Strava">
-      </a>
+      <div class="footer-logos">
+        <a href="https://www.strava.com" target="_blank" rel="noopener">
+          <img src="/images/api_logo_pwrdBy_strava_horiz_white.svg" alt="Powered by Strava">
+        </a>
+      </div>
     </footer>
   </div>
 

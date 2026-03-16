@@ -20,15 +20,43 @@ export default async (req) => {
   // POST = incoming webhook event
   if (req.method === 'POST') {
     const event = await req.json();
-    console.log('Webhook event:', JSON.stringify(event));
+    console.log('Strava webhook event:', JSON.stringify(event));
+
+    const db = getSupabase();
 
     // Handle athlete deauthorization
     if (event.object_type === 'athlete' && event.updates?.authorized === 'false') {
-      const db = getSupabase();
-      const athleteId = event.owner_id;
-      await db.from('activities').delete().eq('athlete_id', athleteId);
-      await db.from('athletes').delete().eq('id', athleteId);
-      console.log(`Deauthorized athlete ${athleteId} — data deleted`);
+      const stravaAthleteId = String(event.owner_id);
+
+      // Find the platform connection and user
+      const { data: conn } = await db
+        .from('platform_connections')
+        .select('id, user_id')
+        .eq('platform', 'strava')
+        .eq('platform_user_id', stravaAthleteId)
+        .single();
+
+      if (conn) {
+        // Delete Strava-sourced activities
+        await db.from('activities').delete().eq('user_id', conn.user_id).eq('source_platform', 'strava');
+        // Remove the Strava connection
+        await db.from('platform_connections').delete().eq('id', conn.id);
+
+        // Check if user has other connections — if not, clean up
+        const { data: remaining } = await db
+          .from('platform_connections')
+          .select('id')
+          .eq('user_id', conn.user_id);
+        if (!remaining?.length) {
+          await db.from('users').delete().eq('id', conn.user_id);
+        }
+      }
+
+      // Also clean legacy table
+      await db.from('activities').delete().eq('athlete_id', event.owner_id);
+      await db.from('athletes').delete().eq('id', event.owner_id);
+
+      console.log(`Deauthorized Strava athlete ${stravaAthleteId} — data deleted`);
       return new Response('OK', { status: 200 });
     }
 
@@ -39,7 +67,11 @@ export default async (req) => {
 
     // Handle deleted activities
     if (event.aspect_type === 'delete') {
-      const db = getSupabase();
+      await db.from('activities')
+        .delete()
+        .eq('source_platform', 'strava')
+        .eq('source_activity_id', String(event.object_id));
+      // Also try legacy ID
       await db.from('activities').delete().eq('id', event.object_id);
       return new Response('OK', { status: 200 });
     }
@@ -51,6 +83,7 @@ export default async (req) => {
       body: JSON.stringify({
         athleteId: event.owner_id,
         activityId: event.object_id,
+        platform: 'strava',
       }),
     }).catch((err) => console.error('Background dispatch error:', err));
 
