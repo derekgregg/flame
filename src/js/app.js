@@ -36,8 +36,8 @@ function formatDate(iso) {
 }
 
 function platformBadge(platform) {
-  const labels = { strava: 'Strava', wahoo: 'Wahoo', garmin: 'Garmin' };
-  const classes = { strava: 'badge-strava', wahoo: 'badge-wahoo', garmin: 'badge-garmin' };
+  const labels = { strava: 'Strava', wahoo: 'Wahoo', garmin: 'Garmin', upload: 'Upload' };
+  const classes = { strava: 'badge-strava', wahoo: 'badge-wahoo', garmin: 'badge-garmin', upload: 'badge-upload' };
   return `<span class="platform-badge ${classes[platform] || ''}">${labels[platform] || platform}</span>`;
 }
 

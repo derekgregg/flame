@@ -78,7 +78,7 @@ export async function findDuplicate(userId, activity, sourcePlatform, sourceActi
 
 // Source priority for choosing which platform's data to use as primary.
 // Strava is highest because of "View on Strava" link requirement.
-const PRIORITY = { garmin: 1, wahoo: 2, strava: 3 };
+const PRIORITY = { upload: 0, garmin: 1, wahoo: 2, strava: 3 };
 
 export function shouldBecomePrimary(existingSource, newSource) {
   return (PRIORITY[newSource] || 0) > (PRIORITY[existingSource] || 0);

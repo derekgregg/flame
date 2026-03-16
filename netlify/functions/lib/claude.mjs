@@ -40,6 +40,30 @@ function buildPrompt(activity, athlete) {
   if (activity.average_watts) stats.push(`Average watts: ${activity.average_watts}W`);
   if (activity.max_watts) stats.push(`Max watts: ${activity.max_watts}W`);
   if (activity.suffer_score) stats.push(`Suffer score: ${activity.suffer_score}`);
+  if (activity.normalized_power) stats.push(`Normalized power: ${activity.normalized_power}W`);
+  if (activity.avg_cadence) stats.push(`Average cadence: ${activity.avg_cadence} rpm`);
+  if (activity.average_heartrate) stats.push(`Average HR: ${activity.average_heartrate} bpm`);
+  if (activity.max_heartrate) stats.push(`Max HR: ${activity.max_heartrate} bpm`);
+  if (activity.calories) stats.push(`Calories: ${activity.calories}`);
+
+  // Power curve from file upload
+  if (activity.power_curve) {
+    const pc = activity.power_curve;
+    const peaks = [];
+    if (pc['5s']) peaks.push(`5s: ${pc['5s']}W`);
+    if (pc['60s']) peaks.push(`1min: ${pc['60s']}W`);
+    if (pc['300s']) peaks.push(`5min: ${pc['300s']}W`);
+    if (pc['1200s']) peaks.push(`20min: ${pc['1200s']}W`);
+    if (peaks.length) stats.push(`Peak power: ${peaks.join(', ')}`);
+  }
+
+  // Lap splits from file upload
+  if (activity.lap_data && activity.lap_data.length > 1) {
+    const lapSummary = activity.lap_data.map((l, i) =>
+      `Lap ${i + 1}: ${formatDistance(l.distance)} in ${formatDuration(l.duration)}${l.avg_power ? ` @ ${l.avg_power}W` : ''}`
+    ).join(' | ');
+    stats.push(`Laps: ${lapSummary}`);
+  }
 
   const timeDiff = activity.elapsed_time - activity.moving_time;
   if (timeDiff > 60) stats.push(`Time spent stopped: ${formatDuration(timeDiff)}`);

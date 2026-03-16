@@ -92,6 +92,15 @@ export async function processActivity({ userId, platform, platformActivityId, ac
     dedup_key: dedupKey,
     external_id: activity.external_id || null,
     platform_links: platformLink(platform, platformActivityId),
+    // Enrichment fields (from file uploads)
+    normalized_power: activity.normalized_power || null,
+    avg_cadence: activity.avg_cadence || null,
+    max_cadence: activity.max_cadence || null,
+    avg_heart_rate: activity.average_heartrate || null,
+    max_heart_rate: activity.max_heartrate || null,
+    calories: activity.calories || null,
+    lap_data: activity.lap_data || null,
+    enrichment_data: activity.power_curve ? { power_curve: activity.power_curve } : null,
   };
 
   // Keep legacy athlete_id for Strava activities during migration
