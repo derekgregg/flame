@@ -149,6 +149,16 @@ export async function getAthleteActivities(athleteId, after) {
   return activities;
 }
 
+export async function getActivityStreams(athleteId, activityId) {
+  const token = await refreshAccessToken(String(athleteId));
+  const res = await fetch(
+    `${STRAVA_API}/activities/${activityId}/streams?keys=watts,heartrate,cadence,time&key_by_type=true`,
+    { headers: { Authorization: `Bearer ${token}` } }
+  );
+  if (!res.ok) return null;
+  return res.json();
+}
+
 // Normalize Strava activity to our standard format
 export function normalizeActivity(stravaActivity) {
   return {

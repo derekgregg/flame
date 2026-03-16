@@ -1,5 +1,6 @@
 import FitParser from 'fit-file-parser';
 import { XMLParser } from 'fast-xml-parser';
+import { analyzePower } from './power-analysis.mjs';
 
 // Parse an activity file (FIT, GPX, or TCX) and return a normalized activity object.
 export async function parseActivityFile(buffer, filename) {
@@ -73,9 +74,14 @@ function parseFIT(buffer) {
         lap_data: laps.length > 0 ? laps.map(normalizeLap) : null,
       };
 
-      // Compute peak power efforts from records if we have power data
+      // Full power analysis from per-second records
       if (records.length > 0 && records.some(r => r.power != null)) {
-        activity.power_curve = computePowerCurve(records);
+        const powerData = records.map(r => r.power || 0);
+        const analysis = analyzePower(powerData, null, activity.average_watts);
+        activity.power_curve = analysis.best_efforts;
+        if (analysis.normalized_power) activity.normalized_power = analysis.normalized_power;
+        if (analysis.variability_index) activity.variability_index = analysis.variability_index;
+        activity.power_analysis = analysis;
       }
 
       // Convert start_date to ISO string
@@ -102,30 +108,6 @@ function normalizeLap(lap) {
   };
 }
 
-function computePowerCurve(records) {
-  const powers = records.map(r => r.power || 0);
-  if (powers.length === 0) return null;
-
-  const curve = {};
-  const durations = [5, 30, 60, 300, 1200]; // 5s, 30s, 1m, 5m, 20m
-
-  for (const dur of durations) {
-    if (powers.length < dur) continue;
-    let maxAvg = 0;
-    let sum = 0;
-    for (let i = 0; i < powers.length; i++) {
-      sum += powers[i];
-      if (i >= dur) sum -= powers[i - dur];
-      if (i >= dur - 1) {
-        const avg = sum / dur;
-        if (avg > maxAvg) maxAvg = avg;
-      }
-    }
-    curve[`${dur}s`] = Math.round(maxAvg);
-  }
-
-  return Object.keys(curve).length > 0 ? curve : null;
-}
 
 // --- GPX ---
 

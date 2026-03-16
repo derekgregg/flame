@@ -1,6 +1,46 @@
 import { getSupabase } from './supabase.mjs';
 import { generateRoast } from './claude.mjs';
 import { computeDedupKey, findDuplicate } from './dedup.mjs';
+import { analyzePower } from './power-analysis.mjs';
+
+function buildEnrichmentData(activity) {
+  const data = {};
+  if (activity.power_curve) data.best_efforts = activity.power_curve;
+  if (activity.power_analysis) {
+    if (activity.power_analysis.best_efforts) data.best_efforts = activity.power_analysis.best_efforts;
+    if (activity.power_analysis.variability_index) data.variability_index = activity.power_analysis.variability_index;
+    if (activity.power_analysis.intensity_factor) data.intensity_factor = activity.power_analysis.intensity_factor;
+    if (activity.power_analysis.tss) data.tss = activity.power_analysis.tss;
+    if (activity.power_analysis.intervals) data.intervals = activity.power_analysis.intervals;
+  }
+  return Object.keys(data).length > 0 ? data : null;
+}
+
+// Fetch Strava power streams and run power analysis.
+// Returns enrichment data or null.
+async function fetchStravaPowerAnalysis(platformActivityId, athleteId, ftp, avgPower) {
+  try {
+    const { getActivityStreams } = await import('./strava.mjs');
+    const streams = await getActivityStreams(athleteId, platformActivityId);
+    if (!streams) return null;
+
+    // Strava returns streams as array of { type, data } or keyed object
+    let powerData;
+    if (Array.isArray(streams)) {
+      const powerStream = streams.find(s => s.type === 'watts');
+      powerData = powerStream?.data;
+    } else {
+      powerData = streams.watts?.data;
+    }
+
+    if (!powerData?.length) return null;
+
+    return analyzePower(powerData, ftp, avgPower);
+  } catch (err) {
+    console.error('Strava streams fetch failed:', err.message);
+    return null;
+  }
+}
 
 // Store an activity and generate commentary.
 // An activity is the top-level object. It may be linked to one or more
@@ -87,7 +127,7 @@ export async function processActivity({ userId, platform, platformActivityId, ac
     max_heart_rate: activity.max_heartrate ? Math.round(activity.max_heartrate) : null,
     calories: activity.calories ? Math.round(activity.calories) : null,
     lap_data: activity.lap_data || null,
-    enrichment_data: activity.power_curve ? { power_curve: activity.power_curve } : null,
+    enrichment_data: buildEnrichmentData(activity),
   };
 
   // Keep legacy athlete_id for Strava during migration
@@ -107,6 +147,23 @@ export async function processActivity({ userId, platform, platformActivityId, ac
   }
 
   const activityDbId = inserted?.id || row.id;
+
+  // Fetch per-second power data from Strava streams (if available and not already analyzed)
+  if (platform === 'strava' && activity.average_watts && !activity.power_analysis) {
+    const athleteId = parseInt(platformActivityId) || row.athlete_id;
+    const analysis = await fetchStravaPowerAnalysis(platformActivityId, athleteId, user?.ftp, activity.average_watts);
+    if (analysis) {
+      activity.power_analysis = analysis;
+      activity.power_curve = analysis.best_efforts;
+      if (analysis.normalized_power) activity.normalized_power = analysis.normalized_power;
+
+      // Update the stored enrichment data
+      await db.from('activities').update({
+        enrichment_data: buildEnrichmentData(activity),
+        normalized_power: analysis.normalized_power ? Math.round(analysis.normalized_power) : null,
+      }).eq('id', activityDbId);
+    }
+  }
 
   // Generate commentary
   try {

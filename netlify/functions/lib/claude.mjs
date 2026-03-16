@@ -47,15 +47,34 @@ function buildPrompt(activity, athlete) {
   if (activity.max_heartrate) stats.push(`Max HR: ${activity.max_heartrate} bpm`);
   if (activity.calories) stats.push(`Calories: ${activity.calories}`);
 
-  // Power curve from file upload
-  if (activity.power_curve) {
-    const pc = activity.power_curve;
-    const peaks = [];
-    if (pc['5s']) peaks.push(`5s: ${pc['5s']}W`);
-    if (pc['60s']) peaks.push(`1min: ${pc['60s']}W`);
-    if (pc['300s']) peaks.push(`5min: ${pc['300s']}W`);
-    if (pc['1200s']) peaks.push(`20min: ${pc['1200s']}W`);
-    if (peaks.length) stats.push(`Peak power: ${peaks.join(', ')}`);
+  // Best power efforts
+  const bestEfforts = activity.power_analysis?.best_efforts || activity.power_curve;
+  if (bestEfforts) {
+    const effortLabels = [
+      ['5s', '5s'], ['15s', '15s'], ['30s', '30s'], ['1min', '1min'], ['3min', '3min'],
+      ['5min', '5min'], ['8min', '8min'], ['10min', '10min'], ['15min', '15min'],
+      ['20min', '20min'], ['30min', '30min'], ['45min', '45min'], ['60min', '60min'], ['90min', '90min'],
+    ];
+    const peaks = effortLabels
+      .filter(([key]) => bestEfforts[key])
+      .map(([key, label]) => `${label}: ${bestEfforts[key]}W`);
+    if (peaks.length) stats.push(`Best efforts: ${peaks.join(', ')}`);
+  }
+
+  // Power metrics
+  if (activity.power_analysis?.variability_index) {
+    stats.push(`Variability Index: ${activity.power_analysis.variability_index} (${activity.power_analysis.variability_index > 1.05 ? 'surgy/uneven' : 'steady'})`);
+  }
+  if (activity.power_analysis?.tss) {
+    stats.push(`Training Stress Score: ${activity.power_analysis.tss}`);
+  }
+
+  // Interval detection
+  if (activity.power_analysis?.intervals) {
+    const ints = activity.power_analysis.intervals;
+    stats.push(`Detected ${ints.length} intervals: ${ints.map((iv, i) =>
+      `#${i + 1}: ${formatDuration(iv.duration)} @ ${iv.avg_power}W (${iv.pct_ftp}% FTP)`
+    ).join(', ')}`);
   }
 
   // Lap splits from file upload
