@@ -21,11 +21,7 @@
       <a href="/upload.html" class="nav-link">Add Activity</a>
       <a href="/settings.html" class="nav-link">Settings</a>
     </nav>
-    <nav id="login-nav" class="user-nav">
-      <a href="/api/google-auth" class="login-link">Sign In</a>
-    </nav>
-
-    <div id="controls" class="controls hidden">
+    <div id="controls" class="controls">
       <select id="filter-user">
         <option value="">All Athletes</option>
       </select>
@@ -45,6 +41,7 @@
         <option value="moving_time">Duration</option>
         <option value="elevation_gain">Elevation</option>
       </select>
+      <a href="/api/google-auth" id="login-link" class="login-link" style="margin-left: auto;">Sign In</a>
     </div>
 
     <div id="leaderboard">

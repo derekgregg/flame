@@ -28,7 +28,10 @@ async function loadSettings() {
   const connections = data.connections || [];
   const connectedPlatforms = connections.map(c => c.platform);
 
+  const isWelcome = new URLSearchParams(window.location.search).get('welcome');
+
   content.innerHTML = `
+    ${isWelcome ? `<div class="settings-section"><div class="settings-card" style="border-color: var(--gold);"><p style="color: var(--accent);">Welcome to Le Directeur! Set up your profile so we can judge you properly.</p></div></div>` : ''}
     <div class="settings-section">
       <h2>Profile</h2>
       <div class="settings-card">

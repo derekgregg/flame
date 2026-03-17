@@ -137,7 +137,7 @@ async function checkAuth() {
     if (data.user) {
       isLoggedIn = true;
       userNav.classList.remove('hidden');
-      document.getElementById('login-nav')?.classList.add('hidden');
+      document.getElementById('login-link')?.classList.add('hidden');
       userGreeting.textContent = data.user.display_name;
 
       if (data.connections) {
@@ -185,8 +185,7 @@ async function loadLeaderboard() {
       return;
     }
 
-    // Show filters and Strava logo when there's content
-    controls.classList.remove('hidden');
+    // Show Strava logo when there's Strava content
     if (hasStrava || data.activities.some(a => a.platform_links?.strava || a.source_platform === 'strava')) {
       stravaLogo.classList.remove('hidden');
     }

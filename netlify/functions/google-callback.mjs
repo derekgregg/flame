@@ -70,6 +70,8 @@ export default async (req) => {
       .eq('platform_user_id', googleUser.id)
       .single();
 
+    let isNewUser = false;
+
     if (existing) {
       userId = existing.user_id;
       // Update profile pic if changed
@@ -102,6 +104,7 @@ export default async (req) => {
         .single();
       if (userError) throw userError;
       userId = newUser.id;
+      isNewUser = true;
 
       await db.from('platform_connections').insert({
         user_id: userId,
@@ -122,7 +125,9 @@ export default async (req) => {
     return new Response(null, {
       status: 302,
       headers: {
-        Location: `${process.env.SITE_URL}/callback.html?success=true&name=${encodeURIComponent(name)}&user_id=${userId}&platform=google`,
+        Location: isNewUser
+          ? `${process.env.SITE_URL}/settings.html?welcome=true`
+          : `${process.env.SITE_URL}/callback.html?success=true&name=${encodeURIComponent(name)}&user_id=${userId}&platform=google`,
         'Set-Cookie': getSessionCookie(token),
       },
     });
