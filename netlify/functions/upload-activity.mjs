@@ -99,12 +99,16 @@ export default async (req) => {
     return new Response(JSON.stringify({ error: 'Failed to create upload record' }), { status: 500 });
   }
 
-  // Dispatch background processing
-  fetch(`${process.env.SITE_URL}/api/parse-upload-background`, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ uploadId, userId }),
-  }).catch((err) => console.error('Parse dispatch error:', err));
+  // Dispatch background processing — must await so Netlify doesn't kill the process
+  try {
+    await fetch(`${process.env.SITE_URL}/api/parse-upload-background`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ uploadId, userId }),
+    });
+  } catch (err) {
+    console.error('Parse dispatch error:', err);
+  }
 
   return new Response(JSON.stringify({ uploadId, status: 'processing' }), {
     headers: { 'Content-Type': 'application/json' },
