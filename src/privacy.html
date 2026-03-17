@@ -37,7 +37,7 @@
       <ul>
         <li>Name and profile picture (from your connected platform)</li>
         <li>Platform user ID (Strava, Wahoo, and/or Garmin)</li>
-        <li>Weight (if provided by you or your platform profile, used for power-to-weight calculations)</li>
+        <li>Weight, height, and FTP (if provided by you, used for power-to-weight and training analysis)</li>
         <li>Your sharing preferences</li>
       </ul>
 
@@ -53,6 +53,8 @@
         <li>GPS tracks and location data (from uploaded activity files)</li>
         <li>Lap and split data (if available)</li>
         <li>Cadence and temperature data (if available)</li>
+        <li>Per-second power data (from uploaded files or Strava streams, used to compute best efforts, normalized power, and training metrics)</li>
+        <li>Route polylines (simplified GPS tracks for map display)</li>
       </ul>
 
       <h3>Google Sign-In Data</h3>
@@ -78,13 +80,14 @@
         <li><strong>Garmin:</strong> Via the Garmin Connect API with OAuth 2.0 PKCE authorization. We request activity read access.</li>
       </ul>
       <p>New activities are delivered to us via webhooks (push notifications) from each platform. We do not poll or scrape any platform.</p>
-      <p>You may also <strong>upload activity files</strong> (.FIT, .GPX, .TCX) directly. These files are parsed server-side to extract activity data, including GPS tracks, and are deleted from our storage after processing.</p>
+      <p>You may also <strong>upload activity files</strong> (.FIT, .GPX, .TCX) directly. These files are parsed server-side to extract activity data including GPS tracks, per-second power data, and lap splits. Raw files are retained for up to 30 days (see Data Retention) in case reprocessing is needed.</p>
 
       <h2>4. How We Use Your Data</h2>
       <p>Your activity data is used for one purpose: <strong>generating AI-powered commentary</strong> on your workouts using the Claude API (by Anthropic). Specifically:</p>
       <ul>
-        <li>Activity statistics (distance, time, speed, power, lap splits, etc.) are sent to the Claude API as context for generating a short humorous commentary about the activity.</li>
-        <li>GPS tracks from uploaded files are used to compute distance and elevation. GPS coordinates are <strong>not</strong> sent to the Claude API or displayed to other users.</li>
+        <li>Activity statistics (distance, time, speed, power, lap splits, best efforts, training metrics, etc.) are sent to the Claude API as context for generating a short humorous commentary about the activity.</li>
+        <li>Per-second power data is analyzed to compute best efforts (peak power at various durations), normalized power, variability index, intensity factor, training stress score, and interval detection.</li>
+        <li>GPS tracks are simplified into route polylines and displayed on activity cards as maps. Full-resolution GPS coordinates are <strong>not</strong> stored, sent to the Claude API, or displayed to other users.</li>
         <li>We use Claude for <strong>inference only</strong>. Your data is never used for model training, fine-tuning, or building datasets.</li>
         <li>If you opt in to group sharing, your activities and commentary are displayed on the shared leaderboard visible to other opted-in users. GPS tracks are never shared.</li>
       </ul>
@@ -98,6 +101,7 @@
         <li><strong>With Supabase:</strong> Your data is stored in a Supabase-hosted PostgreSQL database. Supabase processes data according to their <a href="https://supabase.com/privacy" target="_blank" rel="noopener">privacy policy</a>.</li>
         <li><strong>With Netlify:</strong> The application is hosted on Netlify. Netlify processes requests according to their <a href="https://www.netlify.com/privacy/" target="_blank" rel="noopener">privacy policy</a>.</li>
         <li><strong>With Google:</strong> If you sign in with Google, authentication is handled via Google OAuth. Google processes data according to their <a href="https://policies.google.com/privacy" target="_blank" rel="noopener">privacy policy</a>.</li>
+        <li><strong>With GitHub:</strong> Bug reports and feature requests submitted through the app are created as issues on our GitHub repository. Your user ID (not your name or email) is included in the issue for tracking purposes.</li>
       </ul>
 
       <h2>6. Data Retention</h2>

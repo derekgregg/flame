@@ -12,7 +12,9 @@ Upload a .FIT file, connect Strava, Wahoo, or Garmin — Le Directeur analyzes y
 - **Power analysis:** Best efforts (5s to 90min), Normalized Power, Variability Index, TSS, interval detection
 - **AI commentary:** Claude generates context-aware commentary using your FTP, weight, height, best efforts, lap splits, and intervals
 - **Route maps:** GPS tracks rendered on dark map tiles via Leaflet
+- **Velominati Rules:** Commentary references The Rules with interactive tooltips showing full rule text
 - **Activity deduplication:** Automatically merges the same ride from multiple platforms
+- **Bug reports & feature requests:** In-app feedback creates GitHub issues automatically
 - **Privacy-first:** Opt-in group sharing, 7-day Strava retention, GDPR/CCPA compliant
 
 ## Tech Stack
