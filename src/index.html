@@ -21,6 +21,9 @@
       <a href="/upload.html" class="nav-link">Add Activity</a>
       <a href="/settings.html" class="nav-link">Settings</a>
     </nav>
+    <nav id="login-nav" class="user-nav">
+      <a href="/api/google-auth" class="connect-btn google-btn" style="padding: 6px 16px; font-size: 0.8rem;">Sign in with Google</a>
+    </nav>
 
     <div id="controls" class="controls hidden">
       <select id="filter-user">
@@ -48,10 +51,6 @@
       <div class="loading">Loading commentary...</div>
     </div>
 
-    <div id="logged-out-cta" class="empty-state hidden">
-      <p>Sign in to upload activities and get brutally honest commentary from Le Directeur.</p>
-      <a href="/api/google-auth" class="connect-btn google-btn" style="margin-top: 16px;">Sign in with Google</a>
-    </div>
 
     <footer>
       <div id="strava-logo" class="footer-logos hidden">

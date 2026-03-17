@@ -5,7 +5,6 @@ const sortBy = document.getElementById('sort-by');
 const userNav = document.getElementById('user-nav');
 const userGreeting = document.getElementById('user-greeting');
 const controls = document.getElementById('controls');
-const loggedOutCta = document.getElementById('logged-out-cta');
 const stravaLogo = document.getElementById('strava-logo');
 
 let isLoggedIn = false;
@@ -138,6 +137,7 @@ async function checkAuth() {
     if (data.user) {
       isLoggedIn = true;
       userNav.classList.remove('hidden');
+      document.getElementById('login-nav')?.classList.add('hidden');
       userGreeting.textContent = data.user.display_name;
 
       if (data.connections) {
@@ -175,7 +175,7 @@ async function loadLeaderboard() {
     if (!data.activities?.length) {
       leaderboard.innerHTML = '';
       if (!isLoggedIn) {
-        loggedOutCta.classList.remove('hidden');
+        leaderboard.innerHTML = '<div class="empty-state"><p>Sign in to upload activities and get brutally honest commentary from Le Directeur.</p></div>';
       } else {
         leaderboard.innerHTML = `<div class="empty-state">
           <p>No commentary yet.</p>
