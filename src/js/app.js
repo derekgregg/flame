@@ -230,60 +230,60 @@ sortBy.addEventListener('change', loadLeaderboard);
 
 checkAuth().then(loadLeaderboard);
 
-// Bug report modal
-const bugModal = document.getElementById('bug-modal');
-const bugLink = document.getElementById('report-bug-link');
-const bugSubmit = document.getElementById('bug-submit');
-const bugCancel = document.getElementById('bug-cancel');
-const bugStatus = document.getElementById('bug-status');
+// Feedback modal (bug reports + feature requests)
+const feedbackModal = document.getElementById('feedback-modal');
+let feedbackType = 'bug';
 
-if (bugLink) {
-  bugLink.addEventListener('click', (e) => {
+document.querySelectorAll('[data-feedback]').forEach(link => {
+  link.addEventListener('click', (e) => {
     e.preventDefault();
-    bugModal.classList.remove('hidden');
+    feedbackType = link.dataset.feedback;
+    const isBug = feedbackType === 'bug';
+    document.getElementById('feedback-heading').textContent = isBug ? 'Report a Bug' : 'Request a Feature';
+    document.getElementById('feedback-title-label').textContent = isBug ? 'What went wrong?' : 'What would you like to see?';
+    document.getElementById('feedback-title').placeholder = isBug ? 'e.g. Upload fails on large files' : 'e.g. Show elevation profile on activity cards';
+    document.getElementById('feedback-description').placeholder = isBug ? 'Steps to reproduce, what you expected, etc.' : 'Describe the feature and why it would be useful.';
+    document.getElementById('feedback-title').value = '';
+    document.getElementById('feedback-description').value = '';
+    document.getElementById('feedback-status').innerHTML = '';
+    feedbackModal.classList.remove('hidden');
   });
-}
+});
 
-if (bugCancel) {
-  bugCancel.addEventListener('click', () => bugModal.classList.add('hidden'));
-}
+document.getElementById('feedback-cancel')?.addEventListener('click', () => feedbackModal.classList.add('hidden'));
+feedbackModal?.addEventListener('click', (e) => { if (e.target === feedbackModal) feedbackModal.classList.add('hidden'); });
 
-if (bugModal) {
-  bugModal.addEventListener('click', (e) => {
-    if (e.target === bugModal) bugModal.classList.add('hidden');
-  });
-}
-
-if (bugSubmit) {
-  bugSubmit.addEventListener('click', async () => {
-    const title = document.getElementById('bug-title').value.trim();
-    if (!title) {
-      bugStatus.innerHTML = '<p style="color: var(--flame);">Please describe the issue.</p>';
-      return;
+document.getElementById('feedback-submit')?.addEventListener('click', async () => {
+  const btn = document.getElementById('feedback-submit');
+  const status = document.getElementById('feedback-status');
+  const title = document.getElementById('feedback-title').value.trim();
+  if (!title) {
+    status.innerHTML = '<p style="color: var(--flame);">Please fill in the title.</p>';
+    return;
+  }
+  btn.disabled = true;
+  btn.textContent = 'Submitting...';
+  try {
+    const res = await fetch('/api/report-bug', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        title,
+        description: document.getElementById('feedback-description').value.trim(),
+        page: window.location.pathname,
+        type: feedbackType,
+      }),
+    });
+    const data = await res.json();
+    if (data.success) {
+      status.innerHTML = `<p style="color: var(--gold);">Thanks! Issue #${data.issueNumber} created.</p>`;
+      setTimeout(() => feedbackModal.classList.add('hidden'), 2000);
+    } else {
+      status.innerHTML = `<p style="color: var(--flame);">${data.error || 'Failed to submit.'}</p>`;
     }
-    bugSubmit.disabled = true;
-    bugSubmit.textContent = 'Submitting...';
-    try {
-      const res = await fetch('/api/report-bug', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          title,
-          description: document.getElementById('bug-description').value.trim(),
-          page: window.location.pathname,
-        }),
-      });
-      const data = await res.json();
-      if (data.success) {
-        bugStatus.innerHTML = `<p style="color: var(--gold);">Thanks! Issue #${data.issueNumber} created.</p>`;
-        setTimeout(() => bugModal.classList.add('hidden'), 2000);
-      } else {
-        bugStatus.innerHTML = `<p style="color: var(--flame);">${data.error || 'Failed to submit.'}</p>`;
-      }
-    } catch {
-      bugStatus.innerHTML = '<p style="color: var(--flame);">Failed to submit. Try again.</p>';
-    }
-    bugSubmit.disabled = false;
-    bugSubmit.textContent = 'Submit';
-  });
-}
+  } catch {
+    status.innerHTML = '<p style="color: var(--flame);">Failed to submit. Try again.</p>';
+  }
+  btn.disabled = false;
+  btn.textContent = 'Submit';
+});

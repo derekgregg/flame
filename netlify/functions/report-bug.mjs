@@ -8,20 +8,25 @@ export default async (req) => {
   }
 
   if (!process.env.GITHUB_TOKEN) {
-    return new Response(JSON.stringify({ error: 'Bug reporting not configured' }), { status: 500 });
+    return new Response(JSON.stringify({ error: 'Not configured' }), { status: 500 });
   }
 
   const userId = getUserIdFromRequest(req);
-  const { title, description, page } = await req.json();
+  const { title, description, page, type } = await req.json();
 
   if (!title?.trim()) {
     return new Response(JSON.stringify({ error: 'Title is required' }), { status: 400 });
   }
 
+  const isBug = type !== 'feature';
+  const prefix = isBug ? '[Bug]' : '[Feature]';
+  const labels = isBug ? ['bug', 'user-reported'] : ['enhancement', 'user-reported'];
+
   const body = [
     description?.trim() || '_No description provided._',
     '',
     '---',
+    `**Type:** ${isBug ? 'Bug Report' : 'Feature Request'}`,
     `**Reported from:** ${page || 'unknown'}`,
     `**User:** ${userId || 'not logged in'}`,
     `**Date:** ${new Date().toISOString()}`,
@@ -36,9 +41,9 @@ export default async (req) => {
       'Content-Type': 'application/json',
     },
     body: JSON.stringify({
-      title: `[Bug] ${title.trim()}`,
+      title: `${prefix} ${title.trim()}`,
       body,
-      labels: ['bug', 'user-reported'],
+      labels,
     }),
   });
 

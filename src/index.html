@@ -61,25 +61,27 @@
       </div>
       <a href="/privacy.html" class="footer-link">Privacy Policy</a>
       <span class="footer-sep">·</span>
-      <a href="#" class="footer-link" id="report-bug-link">Report a Bug</a>
+      <a href="#" class="footer-link" data-feedback="bug">Report a Bug</a>
+      <span class="footer-sep">·</span>
+      <a href="#" class="footer-link" data-feedback="feature">Request a Feature</a>
     </footer>
 
-    <div id="bug-modal" class="modal hidden">
+    <div id="feedback-modal" class="modal hidden">
       <div class="modal-content">
-        <h3>Report a Bug</h3>
+        <h3 id="feedback-heading">Report a Bug</h3>
         <div class="settings-field">
-          <label for="bug-title">What went wrong?</label>
-          <input type="text" id="bug-title" placeholder="e.g. Upload fails on large files">
+          <label for="feedback-title" id="feedback-title-label">What went wrong?</label>
+          <input type="text" id="feedback-title" placeholder="">
         </div>
         <div class="settings-field">
-          <label for="bug-description">Details <span class="text-muted">(optional)</span></label>
-          <textarea id="bug-description" rows="3" placeholder="Steps to reproduce, what you expected, etc."></textarea>
+          <label for="feedback-description">Details <span class="text-muted">(optional)</span></label>
+          <textarea id="feedback-description" rows="3" placeholder=""></textarea>
         </div>
         <div class="modal-actions">
-          <button id="bug-submit" class="connect-btn">Submit</button>
-          <button id="bug-cancel" class="connect-btn" style="background: var(--surface); border: 1px solid var(--border);">Cancel</button>
+          <button id="feedback-submit" class="connect-btn">Submit</button>
+          <button id="feedback-cancel" class="connect-btn" style="background: var(--surface); border: 1px solid var(--border);">Cancel</button>
         </div>
-        <div id="bug-status"></div>
+        <div id="feedback-status"></div>
       </div>
     </div>
   </div>
