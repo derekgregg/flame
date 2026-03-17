@@ -80,9 +80,10 @@ export async function processActivity({ userId, platform, platformActivityId, ac
       updates.enrichment_data = { power_curve: activity.power_curve };
     }
 
-    // If the same source is updating, also refresh core fields
-    if (dup.reason === 'same_source') {
-      updates.name = activity.name;
+    // For same-source updates or re-uploads, refresh all core fields
+    const isReupload = platform === 'upload' || dup.reason === 'same_source';
+    if (isReupload) {
+      if (activity.name) updates.name = activity.name;
       updates.distance = activity.distance;
       updates.moving_time = activity.moving_time;
       updates.elapsed_time = activity.elapsed_time;
@@ -91,17 +92,44 @@ export async function processActivity({ userId, platform, platformActivityId, ac
       updates.max_speed = activity.max_speed;
       updates.sport_type = activity.sport_type;
       updates.dedup_key = dedupKey;
+      // Overwrite enrichment fields with fresh data from the file
+      if (activity.average_watts) updates.average_watts = Math.round(activity.average_watts);
+      if (activity.max_watts) updates.max_watts = Math.round(activity.max_watts);
+      if (activity.average_heartrate) updates.avg_heart_rate = Math.round(activity.average_heartrate);
+      if (activity.max_heartrate) updates.max_heart_rate = Math.round(activity.max_heartrate);
+      if (activity.avg_cadence) updates.avg_cadence = Math.round(activity.avg_cadence);
+      if (activity.normalized_power) updates.normalized_power = Math.round(activity.normalized_power);
+      if (activity.lap_data) updates.lap_data = activity.lap_data;
+      updates.enrichment_data = buildEnrichmentData(activity);
       if (activity.route_polyline) updates.route_polyline = activity.route_polyline;
-    }
-
-    // Merge polyline if missing
-    if (!existing?.route_polyline && activity.route_polyline) {
-      updates.route_polyline = activity.route_polyline;
+    } else {
+      // Merge polyline if missing
+      if (!existing?.route_polyline && activity.route_polyline) {
+        updates.route_polyline = activity.route_polyline;
+      }
     }
 
     await db.from('activities').update(updates).eq('id', dup.id);
-    console.log(`Merged ${platform}:${platformActivityId} into activity ${dup.id}`);
-    return { stored: true, reason: dup.reason === 'same_source' ? 'updated' : 'merged', activityDbId: dup.id };
+    console.log(`${isReupload ? 'Updated' : 'Merged'} ${platform}:${platformActivityId} into activity ${dup.id}`);
+
+    // Regenerate commentary on re-uploads
+    if (isReupload) {
+      try {
+        if (user?.weight) activity.athlete_weight = user.weight;
+        if (user?.height) activity.athlete_height = user.height;
+        if (user?.ftp) activity.athlete_ftp = user.ftp;
+        const roast = await generateRoast(activity, {
+          firstname: user?.display_name?.split(' ')[0] || '?',
+          lastname: user?.display_name?.split(' ').slice(1).join(' ') || '',
+        });
+        await db.from('activities').update({ roast, roast_generated_at: new Date().toISOString() }).eq('id', dup.id);
+        console.log(`Commentary regenerated for activity ${dup.id}`);
+      } catch (err) {
+        console.error(`Commentary regeneration failed for activity ${dup.id}:`, err);
+      }
+    }
+
+    return { stored: true, reason: isReupload ? 'updated' : 'merged', activityDbId: dup.id };
   }
 
   // New activity — insert
