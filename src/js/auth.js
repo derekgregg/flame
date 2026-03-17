@@ -12,7 +12,7 @@ if (params.get('success')) {
     <p>Your ${platformLabel} account is connected. Your recent activities are being synced now.</p>
     <div style="margin: 30px 0; padding: 20px; background: var(--surface); border: 1px solid var(--border); border-radius: 8px; text-align: left;">
       <label style="display: flex; align-items: center; gap: 12px; cursor: pointer;">
-        <input type="checkbox" id="share-toggle" style="width: 20px; height: 20px; accent-color: var(--toxic);">
+        <input type="checkbox" id="share-toggle" style="width: 20px; height: 20px; accent-color: var(--gold);">
         <span><strong>Share my activities with the group</strong><br>
         <span style="color: var(--text-muted); font-size: 0.85rem;">Allow other connected athletes to see your activities and commentary on the leaderboard.</span></span>
       </label>

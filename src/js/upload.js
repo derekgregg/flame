@@ -198,7 +198,7 @@ function showStatus(type, message) {
   el.className = `upload-status-msg ${type}`;
   el.innerHTML = type === 'error'
     ? `<p style="color: var(--flame);">${message}</p>`
-    : `<p style="color: var(--toxic);">${message}</p>`;
+    : `<p style="color: var(--gold);">${message}</p>`;
 }
 
 async function pollStatus(uploadId) {

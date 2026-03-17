@@ -5,30 +5,34 @@
 }
 
 :root {
-  --bg: #0a0a0a;
-  --surface: #141414;
-  --surface-hover: #1a1a1a;
-  --border: #2a2a2a;
-  --text: #e0e0e0;
-  --text-muted: #888;
-  --toxic: #39ff14;
-  --toxic-dim: #1a7a0a;
-  --flame: #ff4500;
-  --flame-dim: #7a2200;
+  --bg: #1a2418;
+  --surface: #222e1f;
+  --surface-hover: #2a3827;
+  --border: #3a4a35;
+  --text: #e8e0d0;
+  --text-muted: #9a9080;
+  --accent: #d4c5a0;
+  --accent-dim: #4a4230;
+  --gold: #c9a84c;
+  --flame: #8b2500;
+  --flame-dim: #4a1500;
   --strava-orange: #FC5200;
-  --wahoo-blue: #2D9CDB;
-  --garmin-green: #00B0B9;
+  --wahoo-blue: #5ba4cf;
+  --garmin-green: #4cc9b0;
 }
 
+@import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;0,700;1,400&display=swap');
+
 body {
-  font-family: 'SF Mono', 'Fira Code', 'Cascadia Code', monospace;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
   background: var(--bg);
   color: var(--text);
   min-height: 100vh;
+  font-size: 14px;
 }
 
-a { color: var(--toxic); text-decoration: none; }
-a:hover { text-decoration: underline; }
+a { color: var(--accent); text-decoration: none; }
+a:hover { color: var(--gold); text-decoration: underline; }
 
 .hidden { display: none !important; }
 .text-muted { color: var(--text-muted); }
@@ -48,10 +52,11 @@ header {
 }
 
 header h1 {
-  font-size: 2.5rem;
-  color: var(--toxic);
-  text-shadow: 0 0 20px rgba(57, 255, 20, 0.3);
-  letter-spacing: 2px;
+  font-family: 'Cormorant Garamond', Georgia, serif;
+  font-size: 3rem;
+  font-weight: 700;
+  color: var(--accent);
+  letter-spacing: 4px;
 }
 
 header p {
@@ -75,7 +80,7 @@ header p {
   font-size: 0.8rem;
 }
 
-.nav-link:hover { color: var(--toxic); }
+.nav-link:hover { color: var(--accent); }
 
 /* Controls */
 .controls {
@@ -100,7 +105,7 @@ header p {
 
 .controls select:hover,
 .controls button:hover {
-  border-color: var(--toxic);
+  border-color: var(--accent);
 }
 
 /* Connect Buttons */
@@ -113,11 +118,11 @@ header p {
 
 .connect-btn {
   display: inline-block;
-  background: var(--flame);
-  color: white;
+  background: var(--gold);
+  color: var(--bg);
   padding: 10px 20px;
-  border-radius: 6px;
-  font-weight: bold;
+  border-radius: 4px;
+  font-weight: 600;
   font-family: inherit;
   font-size: 0.85rem;
   border: none;
@@ -174,7 +179,7 @@ header p {
 /* Upload zone */
 .upload-section h2 {
   font-size: 1.1rem;
-  color: var(--toxic);
+  color: var(--accent);
   margin-bottom: 12px;
   padding-bottom: 8px;
   border-bottom: 1px solid var(--border);
@@ -190,13 +195,13 @@ header p {
 }
 
 .upload-zone:hover, .upload-zone.drag-over {
-  border-color: var(--toxic);
-  background: rgba(57, 255, 20, 0.03);
+  border-color: var(--gold);
+  background: rgba(201, 168, 76, 0.05);
 }
 
 .upload-icon {
   font-size: 3rem;
-  color: var(--toxic);
+  color: var(--gold);
   margin-bottom: 12px;
   line-height: 1;
 }
@@ -268,7 +273,7 @@ header p {
   display: flex;
   align-items: center;
   justify-content: center;
-  color: var(--toxic);
+  color: var(--gold);
   font-size: 0.9rem;
   flex-shrink: 0;
 }
@@ -277,7 +282,7 @@ header p {
   width: 24px;
   height: 24px;
   border: 2px solid var(--border);
-  border-top-color: var(--toxic);
+  border-top-color: var(--gold);
   border-radius: 50%;
   animation: spin 0.8s linear infinite;
   flex-shrink: 0;
@@ -298,7 +303,7 @@ header p {
 }
 
 .activity-card:hover {
-  border-color: var(--toxic-dim);
+  border-color: var(--accent-dim);
 }
 
 .card-header {
@@ -321,8 +326,8 @@ header p {
 }
 
 .card-header .activity-type {
-  background: var(--toxic-dim);
-  color: var(--toxic);
+  background: var(--accent-dim);
+  color: var(--accent);
   padding: 2px 8px;
   border-radius: 3px;
   font-size: 0.7rem;
@@ -365,8 +370,8 @@ header p {
 
 .stat-value {
   font-size: 1rem;
-  color: var(--toxic);
-  font-weight: bold;
+  color: var(--gold);
+  font-weight: 600;
 }
 
 /* Activity map */
@@ -378,13 +383,15 @@ header p {
 }
 
 .roast {
-  background: linear-gradient(135deg, rgba(255, 69, 0, 0.08), rgba(57, 255, 20, 0.05));
-  border-left: 3px solid var(--flame);
+  background: rgba(212, 197, 160, 0.06);
+  border-left: 3px solid var(--gold);
   padding: 14px 16px;
   border-radius: 0 6px 6px 0;
+  font-family: 'Courier New', Courier, monospace;
   font-size: 0.9rem;
-  line-height: 1.5;
+  line-height: 1.6;
   color: var(--text);
+  font-style: italic;
 }
 
 /* View on Strava link */
@@ -429,7 +436,7 @@ header p {
 
 .settings-section h2 {
   font-size: 1.1rem;
-  color: var(--toxic);
+  color: var(--accent);
   margin-bottom: 12px;
   padding-bottom: 8px;
   border-bottom: 1px solid var(--border);
@@ -476,7 +483,7 @@ header p {
 .checkbox-label input[type="checkbox"] {
   width: 20px;
   height: 20px;
-  accent-color: var(--toxic);
+  accent-color: var(--accent);
 }
 
 /* Platform rows in settings */
@@ -592,13 +599,13 @@ header p {
   cursor: pointer;
 }
 
-.athlete-row button:hover { border-color: var(--toxic); }
+.athlete-row button:hover { border-color: var(--accent); }
 .athlete-row button.danger { border-color: var(--flame); color: var(--flame); }
 .athlete-row button.danger:hover { background: var(--flame-dim); }
 
 .badge-tracked {
-  background: var(--toxic-dim);
-  color: var(--toxic);
+  background: var(--accent-dim);
+  color: var(--accent);
   padding: 2px 8px;
   border-radius: 3px;
   font-size: 0.7rem;
@@ -618,7 +625,7 @@ header p {
   padding: 80px 20px;
 }
 
-.callback-msg h2 { color: var(--toxic); margin-bottom: 16px; }
+.callback-msg h2 { color: var(--accent); margin-bottom: 16px; }
 .callback-msg.error h2 { color: var(--flame); }
 
 /* Empty state */
@@ -658,7 +665,7 @@ footer img {
   font-size: 0.75rem;
 }
 
-.footer-link:hover { color: var(--toxic); }
+.footer-link:hover { color: var(--accent); }
 
 .footer-sep {
   color: var(--border);
@@ -689,7 +696,7 @@ footer img {
 }
 
 .modal-content h3 {
-  color: var(--toxic);
+  color: var(--accent);
   margin-bottom: 16px;
 }
 

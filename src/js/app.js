@@ -204,10 +204,10 @@ async function loadLeaderboard() {
               doubleClickZoom: false,
               touchZoom: false,
             });
-            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
               maxZoom: 18,
             }).addTo(map);
-            const polyline = L.polyline(coords, { color: '#39ff14', weight: 3, opacity: 0.8 });
+            const polyline = L.polyline(coords, { color: '#c9a84c', weight: 3, opacity: 0.9 });
             polyline.addTo(map);
             map.fitBounds(polyline.getBounds(), { padding: [20, 20] });
           }
@@ -271,7 +271,7 @@ if (bugSubmit) {
       });
       const data = await res.json();
       if (data.success) {
-        bugStatus.innerHTML = `<p style="color: var(--toxic);">Thanks! Issue #${data.issueNumber} created.</p>`;
+        bugStatus.innerHTML = `<p style="color: var(--gold);">Thanks! Issue #${data.issueNumber} created.</p>`;
         setTimeout(() => bugModal.classList.add('hidden'), 2000);
       } else {
         bugStatus.innerHTML = `<p style="color: var(--flame);">${data.error || 'Failed to submit.'}</p>`;
