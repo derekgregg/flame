@@ -11,9 +11,13 @@ const stravaLogo = document.getElementById('strava-logo');
 let isLoggedIn = false;
 let hasStrava = false;
 
+function fmt(n) {
+  return Math.round(n).toLocaleString('en-US');
+}
+
 function formatDistance(meters) {
   if (!meters || meters === 0) return '--';
-  if (meters < 1000) return `${Math.round(meters)}m`;
+  if (meters < 1000) return `${fmt(meters)} m`;
   return `${(meters / 1000).toFixed(2)} km`;
 }
 
@@ -101,8 +105,8 @@ function renderCard(a) {
   if (a.distance > 0) stats.push({ label: 'Distance', value: formatDistance(a.distance) });
   stats.push({ label: 'Time', value: formatDuration(a.moving_time) });
   if (a.average_speed > 0) stats.push({ label: 'Avg Speed', value: formatSpeed(a.average_speed) });
-  if (a.elevation_gain > 0) stats.push({ label: 'Elevation', value: `${Math.round(a.elevation_gain)}m` });
-  if (a.average_watts) stats.push({ label: 'Avg Watts', value: `${a.average_watts}W` });
+  if (a.elevation_gain > 0) stats.push({ label: 'Elevation', value: `${fmt(a.elevation_gain)} m` });
+  if (a.average_watts) stats.push({ label: 'Avg Watts', value: `${fmt(a.average_watts)} W` });
   if (a.suffer_score) stats.push({ label: 'Suffer', value: a.suffer_score });
 
   const statsHTML = stats

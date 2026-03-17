@@ -9,6 +9,10 @@ function getClient() {
   return client;
 }
 
+function fmt(n) {
+  return Math.round(n).toLocaleString('en-US');
+}
+
 function formatDuration(seconds) {
   const h = Math.floor(seconds / 3600);
   const m = Math.floor((seconds % 3600) / 60);
@@ -19,8 +23,8 @@ function formatDuration(seconds) {
 }
 
 function formatDistance(meters) {
-  if (meters < 1000) return `${Math.round(meters)}m`;
-  return `${(meters / 1000).toFixed(2)}km`;
+  if (meters < 1000) return `${fmt(meters)} m`;
+  return `${(meters / 1000).toFixed(2)} km`;
 }
 
 function formatSpeed(mps) {
@@ -35,17 +39,17 @@ function buildPrompt(activity, athlete) {
   if (activity.distance > 0) stats.push(`Distance: ${formatDistance(activity.distance)}`);
   stats.push(`Moving time: ${formatDuration(activity.moving_time)}`);
   stats.push(`Elapsed time: ${formatDuration(activity.elapsed_time)}`);
-  if (activity.total_elevation_gain > 0) stats.push(`Elevation gain: ${activity.total_elevation_gain}m`);
+  if (activity.total_elevation_gain > 0) stats.push(`Elevation gain: ${fmt(activity.total_elevation_gain)} m`);
   if (activity.average_speed > 0) stats.push(`Average speed: ${formatSpeed(activity.average_speed)}`);
   if (activity.max_speed > 0) stats.push(`Max speed: ${formatSpeed(activity.max_speed)}`);
-  if (activity.average_watts) stats.push(`Average watts: ${activity.average_watts}W`);
-  if (activity.max_watts) stats.push(`Max watts: ${activity.max_watts}W`);
-  if (activity.suffer_score) stats.push(`Suffer score: ${activity.suffer_score}`);
-  if (activity.normalized_power) stats.push(`Normalized power: ${activity.normalized_power}W`);
+  if (activity.average_watts) stats.push(`Average watts: ${fmt(activity.average_watts)} W`);
+  if (activity.max_watts) stats.push(`Max watts: ${fmt(activity.max_watts)} W`);
+  if (activity.suffer_score) stats.push(`Suffer score: ${fmt(activity.suffer_score)}`);
+  if (activity.normalized_power) stats.push(`Normalized power: ${fmt(activity.normalized_power)} W`);
   if (activity.avg_cadence) stats.push(`Average cadence: ${activity.avg_cadence} rpm`);
   if (activity.average_heartrate) stats.push(`Average HR: ${activity.average_heartrate} bpm`);
   if (activity.max_heartrate) stats.push(`Max HR: ${activity.max_heartrate} bpm`);
-  if (activity.calories) stats.push(`Calories: ${activity.calories}`);
+  if (activity.calories) stats.push(`Calories: ${fmt(activity.calories)}`);
 
   // Best power efforts
   const bestEfforts = activity.power_analysis?.best_efforts || activity.power_curve;
@@ -57,7 +61,7 @@ function buildPrompt(activity, athlete) {
     ];
     const peaks = effortLabels
       .filter(([key]) => bestEfforts[key])
-      .map(([key, label]) => `${label}: ${bestEfforts[key]}W`);
+      .map(([key, label]) => `${label}: ${fmt(bestEfforts[key])} W`);
     if (peaks.length) stats.push(`Best efforts: ${peaks.join(', ')}`);
   }
 
@@ -73,14 +77,14 @@ function buildPrompt(activity, athlete) {
   if (activity.power_analysis?.intervals) {
     const ints = activity.power_analysis.intervals;
     stats.push(`Detected ${ints.length} intervals: ${ints.map((iv, i) =>
-      `#${i + 1}: ${formatDuration(iv.duration)} @ ${iv.avg_power}W (${iv.pct_ftp}% FTP)`
+      `#${i + 1}: ${formatDuration(iv.duration)} @ ${fmt(iv.avg_power)} W (${iv.pct_ftp}% FTP)`
     ).join(', ')}`);
   }
 
   // Lap splits from file upload
   if (activity.lap_data && activity.lap_data.length > 1) {
     const lapSummary = activity.lap_data.map((l, i) =>
-      `Lap ${i + 1}: ${formatDistance(l.distance)} in ${formatDuration(l.duration)}${l.avg_power ? ` @ ${l.avg_power}W` : ''}`
+      `Lap ${i + 1}: ${formatDistance(l.distance)} in ${formatDuration(l.duration)}${l.avg_power ? ` @ ${fmt(l.avg_power)} W` : ''}`
     ).join(' | ');
     stats.push(`Laps: ${lapSummary}`);
   }
@@ -92,18 +96,18 @@ function buildPrompt(activity, athlete) {
   if (activity.athlete_height && activity.athlete_weight) {
     const heightM = activity.athlete_height / 100;
     const bmi = (activity.athlete_weight / (heightM * heightM)).toFixed(1);
-    stats.push(`Athlete build: ${activity.athlete_height}cm, ${activity.athlete_weight}kg (BMI ${bmi})`);
+    stats.push(`Athlete build: ${activity.athlete_height} cm, ${activity.athlete_weight} kg (BMI ${bmi})`);
     // For cycling context: pro climbers are ~18-20 BMI, sprinters 22-24, most amateurs 23-28
     if (activity.athlete_weight > 85) {
-      stats.push(`Note: at ${activity.athlete_weight}kg, this rider is carrying extra weight on climbs — every kg costs ~2.5s per km at 7% grade`);
+      stats.push(`Note: at ${activity.athlete_weight} kg, this rider is carrying extra weight on climbs — every kg costs ~2.5s per km at 7% grade`);
     }
   } else if (activity.athlete_weight) {
-    stats.push(`Athlete weight: ${activity.athlete_weight}kg`);
+    stats.push(`Athlete weight: ${activity.athlete_weight} kg`);
   }
 
   // Athlete FTP context
   if (activity.athlete_ftp) {
-    stats.push(`Athlete FTP: ${activity.athlete_ftp}W`);
+    stats.push(`Athlete FTP: ${activity.athlete_ftp} W`);
     if (activity.athlete_weight) {
       const ftpWkg = (activity.athlete_ftp / activity.athlete_weight).toFixed(2);
       stats.push(`FTP W/kg: ${ftpWkg}`);
