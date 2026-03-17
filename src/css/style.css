@@ -57,6 +57,15 @@ header h1 {
   font-weight: 700;
   color: var(--accent);
   letter-spacing: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+}
+
+.header-icon {
+  width: 48px;
+  height: 48px;
 }
 
 header p {
