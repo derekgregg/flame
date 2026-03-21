@@ -67,6 +67,11 @@ async function loadSettings() {
         ${renderPlatformRow('strava', 'Strava', connectedPlatforms, connections)}
         ${renderPlatformRow('wahoo', 'Wahoo', connectedPlatforms, connections)}
         ${renderPlatformRow('garmin', 'Garmin', connectedPlatforms, connections)}
+        ${connectedPlatforms.length ? `
+          <div style="margin-top: 12px; text-align: right;">
+            <button id="sync-btn" class="connect-btn small">Sync Activities</button>
+          </div>
+        ` : ''}
       </div>
     </div>
 
@@ -84,6 +89,9 @@ async function loadSettings() {
 
   // Bind events
   document.getElementById('save-profile').addEventListener('click', saveProfile);
+
+  const syncBtn = document.getElementById('sync-btn');
+  if (syncBtn) syncBtn.addEventListener('click', syncActivities);
 
   document.querySelectorAll('.disconnect-btn').forEach(btn => {
     btn.addEventListener('click', () => disconnectPlatform(btn.dataset.platform));
@@ -219,6 +227,30 @@ async function loadFeed() {
   } catch {
     feed.innerHTML = '<p class="text-muted">Failed to load feed.</p>';
   }
+}
+
+async function syncActivities() {
+  const btn = document.getElementById('sync-btn');
+  btn.textContent = 'Syncing...';
+  btn.disabled = true;
+
+  try {
+    const res = await fetch('/api/sync-activities', { method: 'POST' });
+    const data = await res.json();
+    if (data.error) {
+      btn.textContent = 'Sync failed';
+    } else {
+      btn.textContent = 'Synced!';
+      setTimeout(() => loadFeed(), 3000);
+    }
+  } catch {
+    btn.textContent = 'Sync failed';
+  }
+
+  setTimeout(() => {
+    btn.textContent = 'Sync Activities';
+    btn.disabled = false;
+  }, 3000);
 }
 
 loadSettings();
