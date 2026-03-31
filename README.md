@@ -8,7 +8,7 @@ Upload a .FIT file, connect Strava, Wahoo, or Garmin — Le Directeur analyzes y
 
 ## Features
 
-- **Multi-platform:** Strava, Google sign-in, direct file uploads (.FIT, .GPX, .TCX). Wahoo and Garmin support built but pending API access approval.
+- **Multi-platform:** Strava, Google sign-in, direct file uploads (.FIT, .GPX, .TCX). Wahoo and Garmin integrations are built but disabled (API access denied/unresponsive).
 - **Power analysis:** Best efforts (5s to 90min), Normalized Power, Variability Index, TSS, interval detection
 - **Ride analysis:** Climb detection, ride segmentation, W'bal tracking, heart rate zone analysis, pacing analysis
 - **AI commentary:** Claude generates context-aware commentary using your FTP, weight, height, best efforts, lap splits, intervals, and ride analysis

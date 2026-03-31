@@ -16,8 +16,8 @@ async function loadSettings() {
         <p>You're not logged in. Connect a platform to get started.</p>
         <div class="connect-buttons" style="margin-top: 20px; justify-content: center;">
           <a href="/api/strava-auth" class="connect-btn strava-btn">Connect Strava</a>
-          <span class="connect-btn wahoo-btn" style="pointer-events: none; opacity: 0.4;">Wahoo (coming soon)</span>
-          <span class="connect-btn garmin-btn" style="pointer-events: none; opacity: 0.4;">Garmin (not available)</span>
+          <span class="connect-btn wahoo-btn" style="pointer-events: none; opacity: 0.4;">Wahoo (unavailable)</span>
+          <span class="connect-btn garmin-btn" style="pointer-events: none; opacity: 0.4;">Garmin (unavailable)</span>
         </div>
       </div>
     `;
@@ -117,7 +117,7 @@ function renderPlatformRow(platform, label, connected, connections) {
   }
 
   if (unavailable) {
-    const reason = platform === 'garmin' ? 'Not available' : 'Coming soon';
+    const reason = 'Unavailable';
     return `
       <div class="platform-row" style="opacity: 0.5;">
         <span class="platform-name">${label}</span>
